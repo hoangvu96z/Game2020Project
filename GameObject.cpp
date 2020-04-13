@@ -3,33 +3,35 @@
 #include "debug.h"
 #include "Game.h"
 #include "GameObject.h"
+#include "Sprites.h"
 
-/*
-	Initialize game object and load a texture
-*/
-CGameObject::CGameObject(LPCWSTR texturePath)
+vector<LPANIMATION> CGameObject::animations;
+
+CGameObject::CGameObject()
 {
 	x = y = 0;
-	texture = CGame::GetInstance()->LoadTexture(texturePath);
+	vx = vy = 0;
+	nx = 1;	
 }
 
 void CGameObject::Update(DWORD dt)
 {
+	x += vx*dt;
+	y += vy*dt;
 }
 
 void CGameObject::Render()
 {
-	CGame::GetInstance()->Draw(x, y, texture);
 }
+
+void CGameObject::AddAnimation(int aniId)
+{
+	LPANIMATION ani = CAnimations::GetInstance()->Get(aniId);
+	animations.push_back(ani);
+}
+
 
 
 CGameObject::~CGameObject()
 {
-	if (texture != NULL) texture->Release();
-}
-
-void CMario::Update(DWORD dt)
-{
-	x += 0.1f*dt;
-	if (x > 320) x = 0;
 }
