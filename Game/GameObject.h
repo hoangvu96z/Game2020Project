@@ -61,6 +61,7 @@ public:
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;
+	CAnimationSet animations;
 
 public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
@@ -92,7 +93,7 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;
 	virtual void SetState(int state) { this->state = state; }
-
+	virtual void ResetAnimation();
 
 	~CGameObject();
 };
