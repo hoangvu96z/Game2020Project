@@ -6,7 +6,9 @@
 #include "Brick.h"
 #include "Koopas.h"
 #include "Simon.h"
+#include "TileMap.h"
 
+using namespace std;
 class CPlayScene : public CScene
 {
 protected:
@@ -19,14 +21,15 @@ protected:
 	void _ParseSection_ANIMATIONS(string line);
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
+
 public:
+	// CTileMap* map;
 	CPlayScene(int id, LPCWSTR filePath);
 
 	virtual void Load();
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	void LoadTiledMap();
 
 	friend class CPlayScenceKeyHandler;
 };

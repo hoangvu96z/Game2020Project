@@ -1,4 +1,3 @@
-
 #include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -15,16 +14,22 @@
 #include "PlayScence.h"
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
-#define MAIN_WINDOW_TITLE L"CASTLE VANIA"
+#define MAIN_WINDOW_TITLE L"CASTE VANIA"
 
-#define BACKGROUND_COLOR D3DCOLOR_XRGB(10, 10,10)
-#define SCREEN_WIDTH 312
-#define SCREEN_HEIGHT 280
+#define BACKGROUND_COLOR D3DCOLOR_XRGB(0, 0,0)
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
 
 #define MAX_FRAME_RATE 90
 
 CGame *game;
+CTileMap* map;
 
+void LoadMaps()
+{
+	map = new CTileMap(L"resources\\Scene1.png", MAP_SCENCE_1, 10, 0);
+	map->LoadMap("resources\\Scene1_map.csv");
+}
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -65,6 +70,9 @@ void Render()
 		d3ddv->ColorFill(bb, NULL, BACKGROUND_COLOR);
 
 		spriteHandler->Begin(D3DXSPRITE_ALPHABLEND);
+
+		// draw map
+		map->DrawMap();
 
 		CGame::GetInstance()->GetCurrentScene()->Render();
 
@@ -171,6 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	game->InitKeyboard();
 
 	game->Load(L"mario-sample.txt");
+	LoadMaps();
 
 	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 
