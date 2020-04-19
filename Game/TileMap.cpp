@@ -1,4 +1,5 @@
-﻿#include "TileMap.h"
+﻿
+#include "TileMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -64,7 +65,7 @@ void CTileMap::DrawMap()
 			rectTile.right = rectTile.left + tileWidth;
 			rectTile.bottom = rectTile.top + tileHeight;
 
-			CGame::GetInstance()->Draw(pos_x, pos_y, CTextures::GetInstance()->Get(MAP_SCENCE_1), rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
+			CGame::GetInstance()->Draw(pos_x, pos_y, 1, CTextures::GetInstance()->Get(MAP_SCENCE_1), rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
 		}
 	}
 }

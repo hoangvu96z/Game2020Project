@@ -238,9 +238,6 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
-
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -256,7 +253,7 @@ void CPlayScene::Update(DWORD dt)
 	// Update camera to follow simon
 	float cx, cy;
 	player->GetPosition(cx, cy);
-
+	// player->SetOrientation(-1);
 
 	CGame *game = CGame::GetInstance();
 	cx -= game->GetScreenWidth() / 2;
@@ -292,12 +289,11 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	CSimon *simon = ((CPlayScene*)scence)->player;
 	switch (KeyCode)
 	{
-	case DIK_D:
-		simon->StartAttacking();
-		break;
+
 	case DIK_S:
-		if (simon->GetState() != SIMON_STATE_JUMP && simon->GetState() != SIMON_STATE_ATTACK)
-			simon->StartJumping();
+		if (simon->isOnGround == false) return;
+		simon->SetState(SIMON_STATE_JUMP);
+
 		break;
 	case DIK_A: // reset
 		simon->SetState(SIMON_STATE_IDLE);
@@ -315,16 +311,23 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	CGame *game = CGame::GetInstance();
 	CSimon *simon = ((CPlayScene*)scence)->player;
 
-	// disable control key when Mario die 
-	// if (mario->GetState() == MARIO_STATE_DIE) return;
+	if ((simon->GetState() == SIMON_STATE_JUMP || simon->GetState() == SIMON_STATE_DIE)
+		&& simon->isOnGround == false)
+		return;
 
 	if (simon->GetStartAttackTime() > 0 || simon->GetStartJumpTime() > 0)
 		return;
 	if (game->IsKeyDown(DIK_RIGHT))
-		simon->SetState(SIMON_STATE_WALKING_RIGHT);
+	{
+		simon->SetOrientation(1);
+		simon->SetState(SIMON_STATE_WALKING);
+	}
 
 	else if (game->IsKeyDown(DIK_LEFT))
-		simon->SetState(SIMON_STATE_WALKING_LEFT);
+	{
+		simon->SetOrientation(-1);
+		simon->SetState(SIMON_STATE_WALKING);
+	}
 
 	else if (game->IsKeyDown(DIK_DOWN))
 		simon->SetState(SIMON_STATE_SIT);

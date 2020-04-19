@@ -1,8 +1,6 @@
 #include "Animations.h"
 #include "Utils.h"
 
-CAnimationSets * CAnimationSets::__instance = NULL;
-
 void CAnimation::Add(int spriteId, DWORD time)
 {
 	int t = time;
@@ -20,7 +18,7 @@ void CAnimation::Add(int spriteId, DWORD time)
 }
 
 // NOTE: sometimes Animation object is NULL ??? HOW ??? 
-void CAnimation::Render(float x, float y, int alpha)
+void CAnimation::Render(float x, float y, int nx, int alpha)
 {
 	DWORD now = GetTickCount();
 	if (currentFrame == -1)
@@ -39,7 +37,7 @@ void CAnimation::Render(float x, float y, int alpha)
 		}
 	}
 
-	frames[currentFrame]->GetSprite()->Draw(x, y, alpha);
+	frames[currentFrame]->GetSprite()->Draw(x, y, nx, alpha);
 }
 
 CAnimations * CAnimations::__instance = NULL;
@@ -74,6 +72,8 @@ void CAnimations::Clear()
 	animations.clear();
 }
 
+CAnimationSets * CAnimationSets::__instance = NULL;
+
 CAnimationSets::CAnimationSets()
 {
 
@@ -89,8 +89,8 @@ LPANIMATION_SET CAnimationSets::Get(unsigned int id)
 {
 	LPANIMATION_SET ani_set = animation_sets[id];
 	if (ani_set == NULL)
-		DebugOut(L"[ERROR] Failed to find animation set id: %d\n",id);
-	 
+		DebugOut(L"[ERROR] Failed to find animation set id: %d\n", id);
+
 	return ani_set;
 }
 
