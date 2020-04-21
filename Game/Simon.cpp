@@ -1,13 +1,14 @@
+
 #include "Simon.h"
 
-CSimon::CSimon() :CGameObject()
+CSimon::CSimon() : CGameObject()
 {
-
+	SetState(SIMON_STATE_IDLE);
+	// startAttack = 0;
+	isOnGround = true;
 }
 
-
-
-void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 
 	// Calculate x,y
@@ -16,8 +17,8 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vy += SIMON_GRAVITY * dt;
 	// CheckCollisionWithGround(dt, coObjects);
 
-	vector <LPCOLLISIONEVENT> coEvents;
-	vector <LPCOLLISIONEVENT> coEventsResult;
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	// turn off collision when simon is die
 	if (state != SIMON_STATE_DIE)
@@ -30,11 +31,11 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-		if (vy > 0.03f)
+		// isFalling = false;
+		/*if (vy>0.03f)
 		{
-			isFalling = true;
-		}
-
+			
+		}*/
 	}
 	else
 	{
@@ -52,24 +53,21 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		*/
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
-			LPCOLLISIONEVENT  e = coEventsResult[i];
-			if (dynamic_cast<CBrick*>(e->obj))
+			LPCOLLISIONEVENT e = coEventsResult[i];
+			if (dynamic_cast<CBrick *>(e->obj))
 			{
 				if (e->ny != 0)
 				{
 					vy = 0;
 					isOnGround = true;
 					isFalling = false;
-
 				}
-				//else					
-					//y += dy;
 			}
 
-			// switching scene logic		
-			else if (dynamic_cast<CPortal*> (e->obj))
+			// switching scene logic
+			else if (dynamic_cast<CPortal *>(e->obj))
 			{
-				CPortal* p = dynamic_cast<CPortal*> (e->obj);
+				CPortal *p = dynamic_cast<CPortal *>(e->obj);
 				DebugOut(L"[INFO] Switching to scene %d", p->GetSceneId());
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
@@ -81,25 +79,26 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		delete coEvents[i];
 	}
-
 }
-
 
 void CSimon::SetState(int state)
 {
-	CGameObject::SetState(state);
 
+	CGameObject::SetState(state);
 	switch (state)
 	{
 	case SIMON_STATE_WALKING:
 	{
-		if (nx > 0) vx = SIMON_WALKING_SPEED;
-		else vx = -SIMON_WALKING_SPEED;
+		if (nx > 0)
+			vx = SIMON_WALKING_SPEED;
+		else
+			vx = -SIMON_WALKING_SPEED;
 		break;
 	}
 
 	case SIMON_STATE_IDLE:
 	{
+		//isOnGround = true;
 		vx = 0;
 		break;
 	}
@@ -114,11 +113,18 @@ void CSimon::SetState(int state)
 	{
 		isOnGround = false;
 		vy = -SIMON_JUMP_SPEED_Y;
-		// animations[SIMON_ANI_JUMP]->SetAniStartTime(GetTickCount());	
+		break;
 	}
 
 	case SIMON_STATE_SIT:
 	{
+		vx = 0;
+		break;
+	}
+	case SIMON_STATE_ATTACK:
+	{
+
+		isAttacking = true;
 		vx = 0;
 		break;
 	}
@@ -128,19 +134,22 @@ void CSimon::SetState(int state)
 void CSimon::Render()
 {
 	int ani = -1;
-
-	if (isFalling == true)
+	if (state == SIMON_STATE_DIE)
 	{
-		state = SIMON_STATE_SIT;
+		ani = SIMON_ANI_IDLE;
 	}
-
-	if (state == SIMON_STATE_ATTACK) ani = SIMON_ANI_ATTACK;
-	else if (state == SIMON_STATE_JUMP) ani = SIMON_ANI_JUMP;
-	else if (state == SIMON_STATE_SIT) ani = SIMON_ANI_SIT;
+	else if (state == SIMON_STATE_ATTACK)
+		ani = SIMON_ANI_ATTACK;
+	else if (state == SIMON_STATE_JUMP)
+		ani = SIMON_ANI_JUMP;
+	else if (state == SIMON_STATE_SIT)
+		ani = SIMON_ANI_SIT;
 	else
 	{
-		if (vx == 0) ani = SIMON_ANI_IDLE;
-		else	ani = SIMON_ANI_WALKING;
+		if (vx == 0)
+			ani = SIMON_ANI_IDLE;
+		else
+			ani = SIMON_ANI_WALKING;
 	}
 
 	int alpha = 255;
@@ -148,7 +157,7 @@ void CSimon::Render()
 	RenderBoundingBox();
 }
 
-void CSimon::GetBoundingBox(float& left, float& top, float& right, float& bottom)
+void CSimon::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
 	top = y;
@@ -156,3 +165,7 @@ void CSimon::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	bottom = y + SIMON_BBOX_HEIGHT;
 }
 
+void CSimon::Simon_Attack()
+{
+	SetState(SIMON_STATE_ATTACK);
+}

@@ -1,5 +1,4 @@
-﻿
-#include "TileMap.h"
+﻿#include "TileMap.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,12 +10,11 @@ CTileMap::CTileMap(LPCWSTR picturePath, int id, int translate_y, int translate_x
 	translate_x = translate_x;
 
 	textures->Add(id, picturePath, D3DCOLOR_XRGB(0, 0, 0));
-
 }
 
 void CTileMap::LoadMap(const char *filePath)
 {
-	FILE* pFile;
+	FILE *pFile;
 	fopen_s(&pFile, filePath, "r");
 
 	// Reading first line
@@ -31,7 +29,6 @@ void CTileMap::LoadMap(const char *filePath)
 		}
 	}
 
-
 	fclose(pFile);
 }
 
@@ -45,17 +42,17 @@ void CTileMap::DrawMap()
 
 	// draw tiles within the viewport only
 	int colCamLeft = cam_x / tileWidth;
-	int colCamRight = colCamLeft + 320 / tileWidth;
+	int colCamRight = colCamLeft + SCREEN_WIDTH / tileWidth + SCREEN_WIDTH / 2;
 
 	int rowCamTop = cam_y / tileHeight;
-	int rowCamBottom = rowCamTop + 240 / tileHeight;
+	int rowCamBottom = rowCamTop + 180 / tileHeight;
 
 	for (int j = colCamLeft; j <= colCamRight; j++)
 	{
 		for (int i = rowCamTop; i < rowCamBottom; i++)
 		{
 			float pos_x = (j - colCamLeft) * tileWidth - remain_x + translate_x;
-			float pos_y = (i - rowCamTop) * tileHeight - remain_y + translate_y + 20;
+			float pos_y = (i - rowCamTop) * tileHeight - remain_y + translate_y + 22;
 
 			RECT rectTile;
 			int index = tiledMap[i][j];
@@ -65,7 +62,7 @@ void CTileMap::DrawMap()
 			rectTile.right = rectTile.left + tileWidth;
 			rectTile.bottom = rectTile.top + tileHeight;
 
-			CGame::GetInstance()->Draw(pos_x, pos_y, 1, CTextures::GetInstance()->Get(MAP_SCENCE_1), rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
+			CGame::GetInstance()->Draw(pos_x, pos_y, -1, CTextures::GetInstance()->Get(MAP_SCENCE_1), rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
 		}
 	}
 }

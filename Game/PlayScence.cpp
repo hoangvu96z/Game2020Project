@@ -258,6 +258,10 @@ void CPlayScene::Update(DWORD dt)
 	CGame *game = CGame::GetInstance();
 	cx -= game->GetScreenWidth() / 2;
 	cy -= game->GetScreenHeight() / 2;
+	if (cx>SCREEN_WIDTH-(SCREEN_WIDTH/4+20))
+	{
+		return;
+	}
 
 	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
 }
@@ -288,12 +292,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 
 	CSimon *simon = ((CPlayScene*)scence)->player;
 	switch (KeyCode)
-	{
-
-	case DIK_S:
+	{	
+	case DIK_SPACE:
 		if (simon->isOnGround == false) return;
-		simon->SetState(SIMON_STATE_JUMP);
-
+		simon->SetState(SIMON_STATE_JUMP);		
+		break;	
+	case DIK_S:
+		simon->SetState(SIMON_STATE_ATTACK);
 		break;
 	case DIK_A: // reset
 		simon->SetState(SIMON_STATE_IDLE);
@@ -311,11 +316,9 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	CGame *game = CGame::GetInstance();
 	CSimon *simon = ((CPlayScene*)scence)->player;
 
-	if ((simon->GetState() == SIMON_STATE_JUMP || simon->GetState() == SIMON_STATE_DIE)
-		&& simon->isOnGround == false)
-		return;
-
-	if (simon->GetStartAttackTime() > 0 || simon->GetStartJumpTime() > 0)
+	if ((simon->GetState() == SIMON_STATE_IDLE ||
+		simon->GetState()==SIMON_STATE_ATTACK)
+	 &&simon->isOnGround == false)
 		return;
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
