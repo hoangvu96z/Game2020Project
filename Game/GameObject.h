@@ -12,7 +12,7 @@ using namespace std;
 
 #define ID_TEX_BBOX -100		// special texture to draw object bounding box
 
-class CGameObject;
+class CGameObject; 
 typedef CGameObject * LPGAMEOBJECT;
 
 struct CCollisionEvent;
@@ -21,17 +21,17 @@ struct CCollisionEvent
 {
 	LPGAMEOBJECT obj;
 	float t, nx, ny;
-
+	
 	float dx, dy;		// *RELATIVE* movement distance between this object and obj
 
-	CCollisionEvent(float t, float nx, float ny, float dx = 0, float dy = 0, LPGAMEOBJECT obj = NULL)
-	{
-		this->t = t;
-		this->nx = nx;
+	CCollisionEvent(float t, float nx, float ny, float dx = 0, float dy = 0, LPGAMEOBJECT obj = NULL) 
+	{ 
+		this->t = t; 
+		this->nx = nx; 
 		this->ny = ny;
 		this->dx = dx;
 		this->dy = dy;
-		this->obj = obj;
+		this->obj = obj; 
 	}
 
 	static bool compare(const LPCOLLISIONEVENT &a, LPCOLLISIONEVENT &b)
@@ -52,7 +52,7 @@ public:
 	};
 	ObjectTypes ObjectTag;
 
-	float x;
+	float x;  
 	float y;
 
 	float dx;	// dx = vx*dt
@@ -65,25 +65,26 @@ public:
 
 	int state;
 
-	DWORD dt;
+	DWORD dt; 
 
 	CAnimationSet animations;
 	LPANIMATION_SET animation_set;
 
-public:
+public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
 
-	void SetPosition(D3DXVECTOR2 pos) { SetPosition(pos.x, pos.y); }
 	void SetOrientation(int nx) { this->nx = nx; }
+	int GetOrientation() { return nx; }
 
 	D3DXVECTOR2 GetPosition() { return D3DXVECTOR2(x, y); }
 
 	int GetState() { return this->state; }
-
-	// bool isOnGround = false;
+	
+	bool AABB(float left_a, float top_a, float right_a, float bottom_a,
+		float left_b, float top_b, float right_b, float bottom_b);
 
 	void RenderBoundingBox();
 
@@ -92,13 +93,13 @@ public:
 	LPCOLLISIONEVENT SweptAABBEx(LPGAMEOBJECT coO);
 	void CalcPotentialCollisions(vector<LPGAMEOBJECT> *coObjects, vector<LPCOLLISIONEVENT> &coEvents);
 	void FilterCollision(
-		vector<LPCOLLISIONEVENT> &coEvents,
-		vector<LPCOLLISIONEVENT> &coEventsResult,
-		float &min_tx,
-		float &min_ty,
-		float &nx,
-		float &ny,
-		float &rdx,
+		vector<LPCOLLISIONEVENT> &coEvents, 
+		vector<LPCOLLISIONEVENT> &coEventsResult, 
+		float &min_tx, 
+		float &min_ty, 
+		float &nx, 
+		float &ny, 
+		float &rdx, 
 		float &rdy);
 
 	CGameObject();

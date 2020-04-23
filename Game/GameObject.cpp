@@ -1,7 +1,6 @@
 #include <d3dx9.h>
 #include <algorithm>
 
-
 #include "Utils.h"
 #include "Textures.h"
 #include "Game.h"
@@ -27,8 +26,8 @@ void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 */
 LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 {
-	float sl, st, sr, sb;		// static object bbox
-	float ml, mt, mr, mb;		// moving object bbox
+	float sl, st, sr, sb; // static object bbox
+	float ml, mt, mr, mb; // moving object bbox
 	float t, nx, ny;
 
 	coO->GetBoundingBox(sl, st, sr, sb);
@@ -40,7 +39,7 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 	float sdx = svx * dt;
 	float sdy = svy * dt;
 
-	// (rdx, rdy) is RELATIVE movement distance/velocity 
+	// (rdx, rdy) is RELATIVE movement distance/velocity
 	float rdx = this->dx - sdx;
 	float rdy = this->dy - sdy;
 
@@ -50,16 +49,15 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 		ml, mt, mr, mb,
 		rdx, rdy,
 		sl, st, sr, sb,
-		t, nx, ny
-	);
+		t, nx, ny);
 
-	CCollisionEvent * e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
+	CCollisionEvent *e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
 	return e;
 }
 
 /*
-	Calculate potential collisions with the list of colliable objects
-
+	Calculate potential collisions with the list of colliable objects 
+	
 	coObjects: the list of colliable objects
 	coEvents: list of potential collisions
 */
@@ -100,19 +98,33 @@ void CGameObject::FilterCollision(
 	{
 		LPCOLLISIONEVENT c = coEvents[i];
 
-		if (c->t < min_tx && c->nx != 0) {
-			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
+		if (c->t < min_tx && c->nx != 0)
+		{
+			min_tx = c->t;
+			nx = c->nx;
+			min_ix = i;
+			rdx = c->dx;
 		}
 
-		if (c->t < min_ty  && c->ny != 0) {
-			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy;
+		if (c->t < min_ty && c->ny != 0)
+		{
+			min_ty = c->t;
+			ny = c->ny;
+			min_iy = i;
+			rdy = c->dy;
 		}
 	}
 
-	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
-	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+	if (min_ix >= 0)
+		coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0)
+		coEventsResult.push_back(coEvents[min_iy]);
 }
 
+bool CGameObject::AABB(float left_a, float top_a, float right_a, float bottom_a, float left_b, float top_b, float right_b, float bottom_b)
+{
+	return left_a < right_b && right_a > left_b && top_a < bottom_b && bottom_a > top_b;
+}
 
 void CGameObject::RenderBoundingBox()
 {
@@ -132,10 +144,8 @@ void CGameObject::RenderBoundingBox()
 	CGame::GetInstance()->Draw(x, y, 1, bbox, rect.left, rect.top, rect.right, rect.bottom, 32);
 }
 
-
 CGameObject::~CGameObject()
 {
-
 }
 
 void CGameObject::ResetAnimation()
