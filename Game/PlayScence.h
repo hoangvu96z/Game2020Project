@@ -3,16 +3,23 @@
 #include "Textures.h"
 #include "Scence.h"
 #include "GameObject.h"
+#include "assert.h"
 #include "Brick.h"
 #include "Koopas.h"
+#include <vector>
 #include "Simon.h"
 #include "TileMap.h"
+#include "Candle.h"
+#include "Whip.h"
 
 using namespace std;
-class CPlayScene : public CScene
+class CPlayScene: public CScene
 {
-protected:
+protected: 
 	CSimon* player;	// A play scene has to have player, right? 
+	CWhip* whip;
+	CTileMap* map;
+	// CGame* game = CGame::GetInstance();
 
 	vector<LPGAMEOBJECT> objects;
 
@@ -22,23 +29,29 @@ protected:
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
 
-public:
-	// CTileMap* map;
+public: 
+	
 	CPlayScene(int id, LPCWSTR filePath);
-
 	virtual void Load();
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
 
+	void Whip_Update(DWORD dt);
+	
 	friend class CPlayScenceKeyHandler;
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
 {
-public:
+	bool isNeedToWaitingAnimation = true;
+
+public: 
+	bool AnimationDelay();
 	void KeyState(BYTE *states);
 	void OnKeyDown(int KeyCode);
 	void OnKeyUp(int KeyCode);
+	bool CanProcessKeyboard();
 	CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
 };
+

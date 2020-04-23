@@ -17,8 +17,7 @@ void CAnimation::Add(int spriteId, DWORD time)
 	frames.push_back(frame);
 }
 
-// NOTE: sometimes Animation object is NULL ??? HOW ??? 
-void CAnimation::Render(float x, float y, int nx, int alpha)
+void CAnimation::Render(float x, float y,int nx, int alpha)
 {
 	DWORD now = GetTickCount();
 	if (currentFrame == -1)
@@ -37,7 +36,12 @@ void CAnimation::Render(float x, float y, int nx, int alpha)
 		}
 	}
 
-	frames[currentFrame]->GetSprite()->Draw(x, y, nx, alpha);
+	frames[currentFrame]->GetSprite()->Draw(x, y,nx,alpha);
+}
+
+void CAnimation::RenderByFrame(int fameID, int nx, float x, float y, int alpha)
+{
+	frames[fameID]->GetSprite()->Draw(x, y, nx, alpha);
 }
 
 CAnimations * CAnimations::__instance = NULL;
@@ -89,8 +93,8 @@ LPANIMATION_SET CAnimationSets::Get(unsigned int id)
 {
 	LPANIMATION_SET ani_set = animation_sets[id];
 	if (ani_set == NULL)
-		DebugOut(L"[ERROR] Failed to find animation set id: %d\n", id);
-
+		DebugOut(L"[ERROR] Failed to find animation set id: %d\n",id);
+	 
 	return ani_set;
 }
 
