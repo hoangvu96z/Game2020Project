@@ -28,34 +28,21 @@
 #define SIMON_WALKING_SPEED			0.05f
 #define SIMON_JUMP_SPEED_Y			0.18f
 #define SIMON_DIE_DEFLECT_SPEED	0.5
-#define SIMON_ATTACK_TIME	350
+#define SIMON_ATTACK_TIME	300
 
-
-#define SIMON_BBOX_WIDTH				15
+#define SIMON_BBOX_WIDTH			15
 #define SIMON_BBOX_HEIGHT			30
 class CSimon : public CGameObject
 {
 	CWhip* whip;
 
-	
 public: 
-	bool isOnGround =false;
-	bool isJumping = false;
-	bool isFalling=false;
-	
-	// Xác định trạng thái đang đánh
-	bool isAttacking();
-
+	bool isStanding;
 	CSimon();
-
-	virtual void Update(DWORD dt, vector <LPGAMEOBJECT>* colliable_objects = NULL);
-
-	virtual void Render();
-	void SetState(int state);
-
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* Objects = NULL, vector <LPGAMEOBJECT>* coObject = NULL);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-
-	void Simon_Jumping();
-	void Simon_Attacking();	
 	
+	bool isOnGround() { return vy == 0; }
+	void Render();
+	void SetState(int state);	
 };

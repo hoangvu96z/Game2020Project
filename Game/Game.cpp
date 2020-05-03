@@ -54,22 +54,19 @@ void CGame::Init(HWND hWnd)
 
 	d3ddv->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
 
-	// Initialize sprite helper from Direct3DX helper library
 	D3DXCreateSprite(d3ddv, &spriteHandler);
 
 	OutputDebugString(L"[INFO] InitGame done;\n");
 }
 
-/*
-	Utility function to wrap LPD3DXSPRITE::Draw 
-*/
+
 void CGame::Draw(float x, float y, int nx, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom, int alpha)
 {
 	D3DXVECTOR3 p(x - cam_x, y - cam_y, 0);
 	RECT r;
 	r.left = left;
 	r.top = top;
-	r.right = right;
+	r.right = right ;
 	r.bottom = bottom;
 
 	// flip sprite, using nx parameter
@@ -91,13 +88,14 @@ void CGame::Draw(float x, float y, int nx, LPDIRECT3DTEXTURE9 texture, int left,
 	spriteHandler->Draw(texture, &r, NULL, &p, D3DCOLOR_ARGB(alpha, 255, 255, 255));
 
 	spriteHandler->SetTransform(&oldTransform);
+	
 }
 
 void CGame::SetCamPos(float x, float y)
 {
 	cam_x = x;
 	cam_y = y;
-	if (cam_x < 0) cam_x = 0;		
+	if (cam_x <0) cam_x = 0;		
 	if (cam_y < 0) cam_y = 0;	
 }
 
@@ -190,7 +188,7 @@ void CGame::ProcessKeyboard()
 		if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
 		{
 			HRESULT h = didv->Acquire();
-			if (h == DI_OK)
+			if (h==DI_OK)
 			{ 
 				DebugOut(L"[INFO] Keyboard re-acquired!\n");
 			}
@@ -236,12 +234,8 @@ CGame::~CGame()
 	if (d3d != NULL) d3d->Release();
 }
 
-/*
-	Standard sweptAABB implementation
-	Source: GameDev.net
-*/
 void CGame::SweptAABB(
-	float ml, float mt, float mr, float mb,			
+	float ml, float mt,	float mr, float mb,			
 	float dx, float dy,			
 	float sl, float st, float sr, float sb,
 	float &t, float &nx, float &ny)
@@ -255,6 +249,7 @@ void CGame::SweptAABB(
 
 	t = -1.0f;			// no collision
 	nx = ny = 0;
+	// Broad-phase test 
 	
 	float bl = dx > 0 ? ml : ml + dx;
 	float bt = dy > 0 ? mt : mt + dy;
@@ -274,7 +269,7 @@ void CGame::SweptAABB(
 	else if (dx < 0)
 	{
 		dx_entry = sr - ml;
-		dx_exit = sl - mr;
+		dx_exit = sl- mr;
 	}
 
 
@@ -312,7 +307,7 @@ void CGame::SweptAABB(
 	}
 	
 
-	if ((tx_entry < 0.0f && ty_entry < 0.0f) || tx_entry > 1.0f || ty_entry > 1.0f) return;
+	if (  (tx_entry < 0.0f && ty_entry < 0.0f) || tx_entry > 1.0f || ty_entry > 1.0f) return;
 
 	t_entry = max(tx_entry, ty_entry);
 	t_exit = min(tx_exit, ty_exit);
@@ -325,11 +320,9 @@ void CGame::SweptAABB(
 	{
 		ny = 0.0f;
 		dx > 0 ? nx = -1.0f : nx = 1.0f;
-	}
-	else 
-	{
+	} else {
 		nx = 0.0f;
-		dy > 0 ? ny = -1.0f : ny = 1.0f;
+		dy > 0?ny = -1.0f:ny = 1.0f;
 	}
 
 }
@@ -393,9 +386,6 @@ void CGame::Load(LPCWSTR gameFile)
 		if (line == "[SETTINGS]") { section = GAME_FILE_SECTION_SETTINGS; continue; }
 		if (line == "[SCENES]") { section = GAME_FILE_SECTION_SCENES; continue; }
 
-		//
-		// data section
-		//
 		switch (section)
 		{
 			case GAME_FILE_SECTION_SETTINGS: _ParseSection_SETTINGS(line); break;

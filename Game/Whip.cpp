@@ -5,41 +5,42 @@ CWhip::CWhip():CGameObject()
 	SetState(NORMAL_WHIP);
 }
 
-void CWhip::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
-{
-	
-}
-
-
-
 void CWhip::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	top = y + 15;
-	bottom = top + WHIP_BBOX_HEIGHT;
-	if (nx < 0)
-	{
-		left = x + 50;
-		right = left + WHIP_BBOX_WIDTH;
+	if (nx > 0) {
+		left = x+70;
+		top = y+7;
+		right = left+ WHIP_BBOX_WIDTH;
+		bottom = top+ WHIP_BBOX_HEIGHT;
 	}
-	else if (nx > 0)
-	{
-		left = 190 - WHIP_BBOX_WIDTH + x;
-		right = left + WHIP_BBOX_WIDTH;
+	else {
+		left = x;
+		top = y;
+		right = x - WHIP_BBOX_WIDTH;
+		bottom = y + WHIP_BBOX_HEIGHT;
 	}
+	
 }
 
 bool CWhip::isColliding(float obj_left, float obj_top, float obj_right, float obj_bottom)
 {
 	float whip_left, whip_top, whip_right, whip_bottom;
 	GetBoundingBox(whip_left, whip_top, whip_right, whip_bottom);
-	
 	return CGameObject::AABB(whip_left, whip_top, whip_right, whip_bottom, obj_left, obj_top, obj_right, obj_bottom);
 }
 
-void CWhip::SetWhipPosition(D3DXVECTOR2 simonPos)
+void CWhip::SetWhipPosition(D3DXVECTOR2 simonPos, bool isStanding)
 {
-	simonPos.x -= 50;
-	simonPos.y -= 4;
+	if (isStanding) {
+		if (nx > 0) {
+			simonPos.x -= 49.0f;
+			simonPos.y -= 3.0f;
+		}
+		else {
+			simonPos.x -= 53.0f;
+			simonPos.y -= 2.0f;
+		}
+	}
 	SetPosition(simonPos.x, simonPos.y);
 }
 	
@@ -51,12 +52,8 @@ void CWhip::PowerUp()
 
 void CWhip::Render(int currentFrame)
 {
-	
-	CAnimationSets::GetInstance()->Get(4)->at(NORMAL_WHIP)->RenderByFrame(currentFrame, nx, x+6, y);
+	CAnimationSets::GetInstance()->Get(3)->at(NORMAL_WHIP)->RenderByFrame(currentFrame, nx, x, y);
 	RenderBoundingBox();
 }
 
-void CWhip::SetState(int state)
-{
-
-}
+void CWhip::SetState(int state){}

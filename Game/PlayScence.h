@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include "Textures.h"
+#include "Items.h"
 #include "Scence.h"
 #include "GameObject.h"
 #include "assert.h"
@@ -30,15 +31,11 @@ protected:
 	void _ParseSection_OBJECTS(string line);
 
 public: 
-	
 	CPlayScene(int id, LPCWSTR filePath);
 	virtual void Load();
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-
-	void Whip_Update(DWORD dt);
-	
 	friend class CPlayScenceKeyHandler;
 };
 
@@ -47,7 +44,6 @@ class CPlayScenceKeyHandler : public CScenceKeyHandler
 	bool isNeedToWaitingAnimation = true;
 
 public: 
-	bool AnimationDelay();
 	void KeyState(BYTE *states);
 	void OnKeyDown(int KeyCode);
 	void OnKeyUp(int KeyCode);
