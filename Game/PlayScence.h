@@ -1,26 +1,18 @@
 #pragma once
 #include "Game.h"
 #include "Textures.h"
-#include "Items.h"
 #include "Scence.h"
 #include "GameObject.h"
-#include "assert.h"
 #include "Brick.h"
+#include "Mario.h"
+#include "Goomba.h"
 #include "Koopas.h"
-#include <vector>
-#include "Simon.h"
-#include "TileMap.h"
-#include "Candle.h"
-#include "Whip.h"
 
-using namespace std;
+
 class CPlayScene: public CScene
 {
 protected: 
-	CSimon* player;	// A play scene has to have player, right? 
-	CWhip* whip;
-	CTileMap* map;
-	// CGame* game = CGame::GetInstance();
+	CMario *player;					// A play scene has to have player, right? 
 
 	vector<LPGAMEOBJECT> objects;
 
@@ -30,24 +22,26 @@ protected:
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
 
+	
 public: 
 	CPlayScene(int id, LPCWSTR filePath);
+
 	virtual void Load();
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	friend class CPlayScenceKeyHandler;
+
+	CMario * GetPlayer() { return player; } 
+
+	//friend class CPlayScenceKeyHandler;
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
 {
-	bool isNeedToWaitingAnimation = true;
-
 public: 
-	void KeyState(BYTE *states);
-	void OnKeyDown(int KeyCode);
-	void OnKeyUp(int KeyCode);
-	bool CanProcessKeyboard();
+	virtual void KeyState(BYTE *states);
+	virtual void OnKeyDown(int KeyCode);
+	virtual void OnKeyUp(int KeyCode) {};
 	CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
 };
 

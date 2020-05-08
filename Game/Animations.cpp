@@ -1,6 +1,8 @@
 #include "Animations.h"
 #include "Utils.h"
 
+CAnimationSets * CAnimationSets::__instance = NULL;
+
 void CAnimation::Add(int spriteId, DWORD time)
 {
 	int t = time;
@@ -17,7 +19,8 @@ void CAnimation::Add(int spriteId, DWORD time)
 	frames.push_back(frame);
 }
 
-void CAnimation::Render(float x, float y,int nx, int alpha)
+// NOTE: sometimes Animation object is NULL ??? HOW ??? 
+void CAnimation::Render(float x, float y, int alpha)
 {
 	DWORD now = GetTickCount();
 	if (currentFrame == -1)
@@ -36,12 +39,7 @@ void CAnimation::Render(float x, float y,int nx, int alpha)
 		}
 	}
 
-	frames[currentFrame]->GetSprite()->Draw(x, y,nx,alpha);
-}
-
-void CAnimation::RenderByFrame(int fameID, int nx, float x, float y, int alpha)
-{
-	frames[fameID]->GetSprite()->Draw(x, y, nx, alpha);
+	frames[currentFrame]->GetSprite()->Draw(x, y, alpha);
 }
 
 CAnimations * CAnimations::__instance = NULL;
@@ -75,8 +73,6 @@ void CAnimations::Clear()
 
 	animations.clear();
 }
-
-CAnimationSets * CAnimationSets::__instance = NULL;
 
 CAnimationSets::CAnimationSets()
 {

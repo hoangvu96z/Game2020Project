@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 
 #include "Game.h"
@@ -54,54 +54,24 @@ void CGame::Init(HWND hWnd)
 
 	d3ddv->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
 
+	// Initialize sprite helper from Direct3DX helper library
 	D3DXCreateSprite(d3ddv, &spriteHandler);
 
 	OutputDebugString(L"[INFO] InitGame done;\n");
 }
 
-
-void CGame::Draw(float x, float y, int nx, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom, int alpha)
+/*
+	Utility function to wrap LPD3DXSPRITE::Draw 
+*/
+void CGame::Draw(float x, float y, LPDIRECT3DTEXTURE9 texture, int left, int top, int right, int bottom, int alpha)
 {
 	D3DXVECTOR3 p(x - cam_x, y - cam_y, 0);
-	RECT r;
+	RECT r; 
 	r.left = left;
 	r.top = top;
-	r.right = right ;
+	r.right = right;
 	r.bottom = bottom;
-
-	// flip sprite, using nx parameter
-	D3DXMATRIX oldTransform;
-	D3DXMATRIX newTransform;
-
-	spriteHandler->GetTransform(&oldTransform);
-
-	D3DXVECTOR2 center = D3DXVECTOR2(p.x + (right - left) / 2, p.y + (bottom - top) / 2);
-	D3DXVECTOR2 rotate = D3DXVECTOR2(nx > 0 ? -1 : 1, 1);
-
-	// Xây dựng một ma trận 2D lưu thông tin biến đổi (scale, rotate)
-	D3DXMatrixTransformation2D(&newTransform, &center, 0.0f, &rotate, NULL, 0.0f, NULL);
-
-	// Cần nhân với ma trận cũ để tính ma trận biến đổi cuối cùng
-	D3DXMATRIX finalTransform = newTransform * oldTransform;
-	spriteHandler->SetTransform(&finalTransform);
-
 	spriteHandler->Draw(texture, &r, NULL, &p, D3DCOLOR_ARGB(alpha, 255, 255, 255));
-
-	spriteHandler->SetTransform(&oldTransform);
-	
-}
-
-void CGame::SetCamPos(float x, float y)
-{
-	cam_x = x;
-	cam_y = y;
-	if (cam_x <0) cam_x = 0;		
-	if (cam_y < 0) cam_y = 0;	
-}
-
-D3DXVECTOR2 CGame::GetCamPos()
-{
-	return D3DXVECTOR2(cam_x, cam_y);
 }
 
 int CGame::IsKeyDown(int KeyCode)
@@ -234,6 +204,10 @@ CGame::~CGame()
 	if (d3d != NULL) d3d->Release();
 }
 
+/*
+	Standard sweptAABB implementation
+	Source: GameDev.net
+*/
 void CGame::SweptAABB(
 	float ml, float mt,	float mr, float mb,			
 	float dx, float dy,			
@@ -249,8 +223,11 @@ void CGame::SweptAABB(
 
 	t = -1.0f;			// no collision
 	nx = ny = 0;
+
+	//
 	// Broad-phase test 
-	
+	//
+
 	float bl = dx > 0 ? ml : ml + dx;
 	float bt = dy > 0 ? mt : mt + dy;
 	float br = dx > 0 ? mr + dx : mr;
@@ -320,7 +297,9 @@ void CGame::SweptAABB(
 	{
 		ny = 0.0f;
 		dx > 0 ? nx = -1.0f : nx = 1.0f;
-	} else {
+	}
+	else 
+	{
 		nx = 0.0f;
 		dy > 0?ny = -1.0f:ny = 1.0f;
 	}
@@ -386,6 +365,9 @@ void CGame::Load(LPCWSTR gameFile)
 		if (line == "[SETTINGS]") { section = GAME_FILE_SECTION_SETTINGS; continue; }
 		if (line == "[SCENES]") { section = GAME_FILE_SECTION_SCENES; continue; }
 
+		//
+		// data section
+		//
 		switch (section)
 		{
 			case GAME_FILE_SECTION_SETTINGS: _ParseSection_SETTINGS(line); break;
@@ -401,16 +383,16 @@ void CGame::Load(LPCWSTR gameFile)
 
 void CGame::SwitchScene(int scene_id)
 {
-	// IMPORTANT: has to implement "unload" previous scene assets to avoid duplicate resources
-	current_scene = scene_id;
+	DebugOut(L"[INFO] Switching to scene %d\n", scene_id);
 
-	LPSCENE s = scenes[current_scene];
-	s->Unload();	
+	scenes[current_scene]->Unload();;
 
 	CTextures::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();
 	CAnimations::GetInstance()->Clear();
-	
+
+	current_scene = scene_id;
+	LPSCENE s = scenes[scene_id];
 	CGame::GetInstance()->SetKeyHandler(s->GetKeyEventHandler());
-	s->Load();
+	s->Load();	
 }

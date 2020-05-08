@@ -1,6 +1,7 @@
 #include <d3dx9.h>
 #include <algorithm>
 
+
 #include "Utils.h"
 #include "Textures.h"
 #include "Game.h"
@@ -9,15 +10,12 @@
 
 CGameObject::CGameObject()
 {
-	state = 0;
 	x = y = 0;
 	vx = vy = 0;
 	nx = 1;	
-	visible = true;
-	itemId = -1;
 }
 
-void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects,vector<LPGAMEOBJECT>* coObjects)
+void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	this->dt = dt;
 	dx = vx*dt;
@@ -38,8 +36,10 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 	// deal with moving object: m speed = original m speed - collide object speed
 	float svx, svy;
 	coO->GetSpeed(svx, svy);
+
 	float sdx = svx*dt;
 	float sdy = svy*dt;
+
 	// (rdx, rdy) is RELATIVE movement distance/velocity 
 	float rdx = this->dx - sdx;
 	float rdy = this->dy - sdy;
@@ -52,10 +52,17 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 		sl, st, sr, sb,
 		t, nx, ny
 	);
+
 	CCollisionEvent * e = new CCollisionEvent(t, nx, ny, rdx, rdy, coO);
 	return e;
 }
 
+/*
+	Calculate potential collisions with the list of colliable objects 
+	
+	coObjects: the list of colliable objects
+	coEvents: list of potential collisions
+*/
 void CGameObject::CalcPotentialCollisions(
 	vector<LPGAMEOBJECT> *coObjects, 
 	vector<LPCOLLISIONEVENT> &coEvents)
@@ -106,10 +113,6 @@ void CGameObject::FilterCollision(
 	if (min_iy>=0) coEventsResult.push_back(coEvents[min_iy]);
 }
 
-bool CGameObject::AABB(float left_a, float top_a, float right_a, float bottom_a, float left_b, float top_b, float right_b, float bottom_b)
-{
-	return left_a < right_b&& right_a > left_b && top_a < bottom_b&& bottom_a > top_b;
-}
 
 void CGameObject::RenderBoundingBox()
 {
@@ -126,13 +129,11 @@ void CGameObject::RenderBoundingBox()
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(l, t, 1, bbox, 0, 0, rect.right, rect.bottom, 32);
+	CGame::GetInstance()->Draw(x, y, bbox, rect.left, rect.top, rect.right, rect.bottom, 32);
 }
 
-CGameObject::~CGameObject(){}
 
-void CGameObject::ResetAnimation()
+CGameObject::~CGameObject()
 {
-	for (auto iter : animations)
-		iter->Reset();
+
 }
