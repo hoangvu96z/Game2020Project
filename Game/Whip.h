@@ -13,7 +13,7 @@ class CWhip : public CGameObject
 {
 public:
 	CWhip();
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* Objects = NULL, vector<LPGAMEOBJECT>* coObjects = NULL) {};
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL) {};
 	virtual void Render() {}
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Render(int currentFrame);

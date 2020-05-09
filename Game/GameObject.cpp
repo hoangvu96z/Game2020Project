@@ -14,10 +14,9 @@ CGameObject::CGameObject()
 	vx = vy = 0;
 	nx = 1;	
 	visible = true;
-	itemId = -1;
 }
 
-void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects,vector<LPGAMEOBJECT>* coObjects)
+void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT>* objects)
 {
 	this->dt = dt;
 	dx = vx*dt;
@@ -57,25 +56,25 @@ LPCOLLISIONEVENT CGameObject::SweptAABBEx(LPGAMEOBJECT coO)
 }
 
 void CGameObject::CalcPotentialCollisions(
-	vector<LPGAMEOBJECT> *coObjects, 
-	vector<LPCOLLISIONEVENT> &coEvents)
+	vector<LPGAMEOBJECT> *objects, 
+	vector<LPCOLLISIONEVENT> &events)
 {
-	for (UINT i = 0; i < coObjects->size(); i++)
+	for (UINT i = 0; i < objects->size(); i++)
 	{
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+		LPCOLLISIONEVENT e = SweptAABBEx(objects->at(i));
 
 		if (e->t > 0 && e->t <= 1.0f)
-			coEvents.push_back(e);
+			events.push_back(e);
 		else
 			delete e;
 	}
 
-	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
+	std::sort(events.begin(), events.end(), CCollisionEvent::compare);
 }
 
 void CGameObject::FilterCollision(
-	vector<LPCOLLISIONEVENT> &coEvents,
-	vector<LPCOLLISIONEVENT> &coEventsResult,
+	vector<LPCOLLISIONEVENT> &events,
+	vector<LPCOLLISIONEVENT> &eventsResult,
 	float &min_tx, float &min_ty, 
 	float &nx, float &ny, float &rdx, float &rdy)
 {
@@ -87,11 +86,11 @@ void CGameObject::FilterCollision(
 	nx = 0.0f;
 	ny = 0.0f;
 
-	coEventsResult.clear();
+	eventsResult.clear();
 
-	for (UINT i = 0; i < coEvents.size(); i++)
+	for (UINT i = 0; i < events.size(); i++)
 	{
-		LPCOLLISIONEVENT c = coEvents[i];
+		LPCOLLISIONEVENT c = events[i];
 
 		if (c->t < min_tx && c->nx != 0) {
 			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
@@ -102,8 +101,8 @@ void CGameObject::FilterCollision(
 		}
 	}
 
-	if (min_ix>=0) coEventsResult.push_back(coEvents[min_ix]);
-	if (min_iy>=0) coEventsResult.push_back(coEvents[min_iy]);
+	if (min_ix>=0) eventsResult.push_back(events[min_ix]);
+	if (min_iy>=0) eventsResult.push_back(events[min_iy]);
 }
 
 bool CGameObject::AABB(float left_a, float top_a, float right_a, float bottom_a, float left_b, float top_b, float right_b, float bottom_b)
