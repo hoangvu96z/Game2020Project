@@ -1,17 +1,19 @@
 #pragma once
 #include "Game.h"
 #include "Textures.h"
-#include "Items.h"
 #include "Scence.h"
 #include "GameObject.h"
-#include "assert.h"
 #include "Brick.h"
 #include "Koopas.h"
-#include <vector>
 #include "Simon.h"
 #include "TileMap.h"
 #include "Candle.h"
 #include "Whip.h"
+#include "Map.h"
+#include "Items.h"
+#include "BHeart_Items.h"
+#include "Chain_Items.h"
+#include "Dagger_Items.h"
 
 using namespace std;
 class CPlayScene: public CScene
@@ -20,8 +22,6 @@ protected:
 	CSimon* player;	// A play scene has to have player, right? 
 	CWhip* whip;
 	CTileMap* map;
-	// CGame* game = CGame::GetInstance();
-
 	vector<LPGAMEOBJECT> objects;
 
 	void _ParseSection_TEXTURES(string line);
@@ -40,14 +40,10 @@ public:
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
-{
-	bool isNeedToWaitingAnimation = true;
-
-public: 
-	void KeyState(BYTE *states);
-	void OnKeyDown(int KeyCode);
-	void OnKeyUp(int KeyCode);
-	bool CanProcessKeyboard();
-	CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
+{	
+	public: 	
+		void KeyState(BYTE *states);
+		void OnKeyDown(int KeyCode);
+		void OnKeyUp(int KeyCode);
+		CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
 };
-

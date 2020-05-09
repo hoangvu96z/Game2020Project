@@ -1,6 +1,5 @@
 ﻿#include "Simon.h"
 #include "Candle.h"
-#include "Items.h"
 
 CSimon::CSimon() :CGameObject()
 {
@@ -8,15 +7,19 @@ CSimon::CSimon() :CGameObject()
 	whip = new CWhip();
 }
 
-void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects, vector <LPGAMEOBJECT>* coObjects)
+void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 {
+	// Calculate x,y
 	CGameObject::Update(dt);
 	whip->Update(dt, coObjects);
+
 	// Simple fall down
 	vy += SIMON_GRAVITY * dt;
+	// Simple logic with screen edge
 	if (vx < 0 && x < 0) x = 0;
 	vector <LPCOLLISIONEVENT> coEvents;
 	vector <LPCOLLISIONEVENT> coEventsResult;
+
 	// turn off collision when simon is die
 	if (state != SIMON_STATE_DIE)
 	{
@@ -54,21 +57,35 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects, vector <LPGAMEOBJEC
 				if (e->nx != 0) x += dx;
 				if (e->ny != 0) y += dy;
 			}
-			// collision logic with Brick 
+			// Collision logic with Brick 
 			else if (dynamic_cast<CBrick*>(e->obj))
 			{
 				if (e->ny !=0) vy = 0;				
 			}
 
-			// Collision logic with items
-			else if (dynamic_cast<CItems*>(e->obj))
+			// Collision logic with item
+			else if (dynamic_cast<BHeart_Items*>(e->obj))
 			{
-				e->obj->visible = false;
-				if (e->obj->GetState()==CHAIN)
+				DebugOut(L"[ITEMS] Collision with Heart\n");
+				if (e->nx != 0 || e->ny != 0)
 				{
-					// SetState(UPGRADE);
-					vx = 0;
-					whip->PowerUp();
+					e->obj->SetVisible(false);
+				}
+			}
+			else if (dynamic_cast<Chain_Items*>(e->obj))
+			{
+				DebugOut(L"[ITEMS] Collision with Chain\n");
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
+				}
+			}
+			else if (dynamic_cast<Dagger_Items*>(e->obj))
+			{
+				DebugOut(L"[ITEMS] Collision with Dagger\n");
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
 				}
 			}
 			// switching scene logic		
@@ -77,7 +94,9 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects, vector <LPGAMEOBJEC
 				CPortal* p = dynamic_cast<CPortal*> (e->obj);
 				DebugOut(L"[INFO] Switching to scene %d", p->GetSceneId());
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
-			} else {
+			}
+			else
+			{
 				if (nx != 0) vx = 0;
 				if (ny != 0) vy = 0;				
 			}
@@ -108,7 +127,6 @@ void CSimon::Update(DWORD dt, vector<LPGAMEOBJECT>* Objects, vector <LPGAMEOBJEC
 
 					if (whip->isColliding(left, top, right, bottom) == true)
 					{
-						DebugOut(L"[INFO]Whip Collision with Torch %d %d\n", temp->dx, temp->dy);						
 						temp->SetState(CANDLE_DESTROYED);				
 						temp->animation_set->at(CANDLE_DESTROYED)->SetAniStartTime(GetTickCount());
 					}
@@ -186,7 +204,8 @@ void CSimon::Render()
 	else if (state == SIMON_STATE_SIT_ATTACK) ani = SIMON_ANI_SIT_ATTACK;
 	else if (state == SIMON_STATE_JUMP) ani = SIMON_ANI_JUMP;
 	else if (state == SIMON_STATE_SIT) ani = SIMON_ANI_SIT;
-	else {
+	else
+	{
 		if (vx == 0) ani = SIMON_ANI_IDLE;
 		else	ani = SIMON_ANI_WALKING;
 	}
