@@ -1,13 +1,18 @@
 #pragma once
 #include "GameObject.h"
 #include "Animations.h"
-// Whip
 #define NORMAL_WHIP		0
 #define SHORT_CHAIN		1
-#define LONG_CHAIN		2
+#define LONG_CHAIN			2
 
-#define WHIP_BBOX_HEIGHT 9
-#define WHIP_BBOX_WIDTH 25
+#define WHIP_BBOX_HEIGHT					 6
+#define SHORT_CHAIN_BBOX_WIDTH	24
+#define LONG_CHAIN_BBOX_WIDTH		38
+
+#define OFFSET_TOP									10
+#define OFFSET_LEFT_LONG_CHAIN			15
+#define OFFSET_LEFT_SHORT_CHAIN			25
+#define OFFSET_RIGHT_CHAIN					70
 
 class CWhip : public CGameObject
 {

@@ -6,7 +6,6 @@
 #include "Textures.h"
 #include "Sprites.h"
 #include "Portal.h"
-#include "Map.h"
 
 using namespace std;
 

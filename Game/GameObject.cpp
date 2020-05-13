@@ -125,7 +125,7 @@ void CGameObject::RenderBoundingBox()
 	rect.right = (int)r - (int)l;
 	rect.bottom = (int)b - (int)t;
 
-	CGame::GetInstance()->Draw(l, t, 1, bbox, 0, 0, rect.right, rect.bottom, 32);
+	CGame::GetInstance()->Draw(l, t, 1, bbox, 0, 0, rect.right, rect.bottom, 100);
 }
 
 CGameObject::~CGameObject(){}

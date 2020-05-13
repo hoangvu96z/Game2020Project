@@ -77,6 +77,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				DebugOut(L"[ITEMS] Collision with Chain\n");
 				if (e->nx != 0 || e->ny != 0)
 				{
+					this->whip->PowerUp();
 					e->obj->SetVisible(false);
 				}
 			}

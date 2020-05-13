@@ -6,6 +6,7 @@
 
 class Chain_Items :public CGameObject
 {
+		DWORD timeAppear = -1;
 public:
 	Chain_Items();
 	void Render();

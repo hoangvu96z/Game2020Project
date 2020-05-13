@@ -6,6 +6,7 @@
 
 class BHeart_Items :public CGameObject
 {
+	DWORD timeAppear = -1;
 public:
 	BHeart_Items();
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* objects);
