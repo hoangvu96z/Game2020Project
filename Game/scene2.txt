@@ -1,9 +1,9 @@
 # id	file_path	transparent_color_r	g	b
 [TEXTURES]
-0	textures\mario.png	255	255	255
-20	textures\misc.png	176	224	248
-#50	textures\enemies.png	3	26	110
-30	textures\enemies-2.png	0	128	128
+0	resources\mario.png	255	255	255
+20	resources\misc.png	176	224	248
+#50	resources\enemies.png	3	26	110
+30	resources\enemies-2.png	0	128	128
 
 
 # id	left	top	right	bottom	texture_id
@@ -166,4 +166,4 @@
 
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	300	98	0	380	150	1
+50	300	98	0	380	150	3

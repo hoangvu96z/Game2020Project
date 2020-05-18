@@ -1,10 +1,21 @@
 ﻿#include "Simon.h"
 #include "Candle.h"
 
-CSimon::CSimon() :CGameObject()
+CSimon::CSimon(float x, float y) :CGameObject()
 {
+	start_x = x;
+	start_y = y;
+	this->x = x;
+	this->y = y;
 	SetState(SIMON_STATE_IDLE);
 	whip = new CWhip();
+}
+
+void CSimon::Reset()
+{
+	SetState(SIMON_STATE_IDLE);
+	SetPosition(start_x, start_y);
+	SetSpeed(0, 0);
 }
 
 void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)

@@ -7,8 +7,8 @@
 
 #define MAP_SCENCE_1 -10
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+#define SCREEN_WIDTH 280
+#define SCREEN_HEIGHT 180
 
 using namespace std;
 
@@ -31,12 +31,7 @@ public:
 	CGame* game = CGame::GetInstance();
 	CTextures* textures = CTextures::GetInstance();
 
-	CTileMap(LPCWSTR picturePath, int id, int translate_y, int translate_x);
+	CTileMap(LPCWSTR picturePath, int id, int translate_x, int translate_y);
 	void LoadMap(const char* filePath);
 	void DrawMap();
 };
-
-
-
-
-

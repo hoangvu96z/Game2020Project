@@ -12,6 +12,7 @@
 #include "BHeart_Items.h"
 #include "Chain_Items.h"
 #include "Dagger_Items.h"
+#include "Dagger.h"
 
 using namespace std;
 class CPlayScene: public CScene
@@ -20,6 +21,7 @@ protected:
 	CSimon* player;	// A play scene has to have player, right? 
 	CWhip* whip;
 	CTileMap* map;
+	CDagger* dagger;
 	vector<LPGAMEOBJECT> objects;
 
 	void _ParseSection_TEXTURES(string line);
@@ -35,6 +37,7 @@ public:
 	virtual void Render();
 	virtual void Unload();
 	friend class CPlayScenceKeyHandler;
+	CSimon* GetPlayer() { return player; }
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
