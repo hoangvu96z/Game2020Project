@@ -238,9 +238,7 @@ void CPlayScene::Load()
 
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 
-	// Load map resource 
-	map = new CTileMap(L"resources\\Scene1.png", MAP_SCENCE_1, 0, 22);
-	map->LoadMap("resources\\Scene1_map.csv");	
+	tilemaps->Add(MAP_1, MAP_1_TEX_PATH, MAP_1_MATRIX_PATH, MAP_1_WIDTH, MAP_1_HEIGHT);
 }
 
 
@@ -265,7 +263,8 @@ void CPlayScene::Update(DWORD dt){
 	// Update camera to follow simon
 	float cx, cy;
 	player->GetPosition(cx, cy);
-	if ( cx>600)
+	int mapWidth = CMaps::GetInstance()->Get(MAP_1)->GetMapWidth();
+	if ( cx>mapWidth-SCREEN_WIDTH/2-32)
 	{
 		return;
 	}
@@ -279,7 +278,7 @@ void CPlayScene::Update(DWORD dt){
 void CPlayScene::Render()
 {
 	// Render map
-	 map->DrawMap();
+	 tilemaps->Get(MAP_1)->DrawMap(CGame::GetInstance()->GetCamPos());
 	for (int i = objects.size()-1; i >=0;i--) // Simon is rendered at the last 
 	{
 		if (objects[i]->visible == false)

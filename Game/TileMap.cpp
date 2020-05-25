@@ -1,63 +1,102 @@
 ﻿#include "TileMap.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
+#include "Utils.h"
 
-CTileMap::CTileMap(LPCWSTR _picturePath, int _id, int _translate_x, int _translate_y)
+CMaps *CMaps::__instance = NULL;
+
+CMap::CMap(int ID, LPCWSTR texPath, LPCWSTR dataPath, int mapwidth, int mapheight)
 {
-	this->ID = _id;
-	this->translate_x = _translate_x;
-	this->translate_y = _translate_y;
-	textures->Add(ID, _picturePath, D3DCOLOR_XRGB(0, 0, 0));
+	this->mapId = ID;
+	this->mapWidth = mapwidth;
+	this->mapHeight = mapheight;
+	LoadResources(texPath);
+	LoadData(dataPath);
 }
 
-void CTileMap::LoadMap(const char *filePath)
+void CMap::LoadResources(LPCWSTR texPath)
 {
-	FILE* pFile;
-	fopen_s(&pFile,filePath, "r");
+	CSprites *sprites = CSprites::GetInstance();
+	CTextures *textures = CTextures::GetInstance();
 
-	// Reading first line
-	fscanf_s(pFile, "%d %d %d %d", &mapRows, &mapColumns, &tileWidth, &tileHeight);
+	textures->Add(mapId, texPath, D3DCOLOR_XRGB(5, 5, 5));
+	LPDIRECT3DTEXTURE9 texTileMap = textures->Get(mapId);
 
-	// Then cotinue parsing matrix
-	for (int i = 0; i < mapRows; i++)
+	D3DSURFACE_DESC surfaceDesc;
+	int level = 0;
+	texTileMap->GetLevelDesc(level, &surfaceDesc);
+
+	int nums_rowToRead = surfaceDesc.Height / TILE_HEIGHT;
+	int nums_colToRead = surfaceDesc.Width / TILE_WIDTH;
+
+	int id_sprite = 0;
+	for (UINT i = 0; i < nums_rowToRead; i++)
 	{
-		for (int j = 0; j < mapColumns; j++)
+		for (UINT j = 0; j < nums_colToRead; j++)
 		{
-			fscanf_s(pFile, "%d", &tiledMap[i][j]);
+			int idTile = mapId + id_sprite;
+			sprites->Add(idTile, TILE_WIDTH * j, TILE_HEIGHT * i, TILE_WIDTH * (j + 1), TILE_HEIGHT * (i + 1), texTileMap);
+			id_sprite = id_sprite + 1;
 		}
 	}
-	fclose(pFile);	
 }
 
-void CTileMap::DrawMap()
+void CMap::LoadData(LPCWSTR dataPath)
 {
-	float x =0;
-	float y = 0;
-		
-	int colCamLeft = x/tileWidth;
-	int colCamRight = colCamLeft + SCREEN_WIDTH / tileWidth+SCREEN_WIDTH/2;
+	CSprites *sprites = CSprites::GetInstance();
+	fstream fs;
+	fs.open(dataPath, ios::in);
 
-	int rowCamTop = y / tileHeight;
-	int rowCamBottom = rowCamTop + SCREEN_HEIGHT / tileHeight;
-
-	for (int j = colCamLeft; j <= colCamRight; j++) 
+	if (fs.fail())
 	{
-		for (int i = rowCamTop; i < rowCamBottom; i++)
+		DebugOut(L"[ERROR] CMap::Load_MapData failed: ID=%d", mapId);
+		fs.close();
+		return;
+	}
+
+	string line;
+	while (!fs.eof())
+	{
+		getline(fs, line);
+		vector<LPSPRITE> spriteline;
+		stringstream ss(line);
+		int n;
+		while (ss >> n)
 		{
-			float pos_x = (j - colCamLeft) * tileWidth+ translate_x;
-			float pos_y = (i - rowCamTop) * tileHeight+translate_y;
-
-			RECT rectTile;
-			int index = tiledMap[i][j];
-
-			rectTile.left = (index % mapColumns) * tileWidth;
-			rectTile.top = (index / mapColumns) * tileHeight;
-			rectTile.right = rectTile.left + tileWidth;
-			rectTile.bottom = rectTile.top + tileHeight;
-
-			 CGame::GetInstance()->Draw(pos_x, pos_y, -1,CTextures::GetInstance()->Get(MAP_SCENCE_1), rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
-			
+			int idTile = mapId + n;
+			spriteline.push_back(sprites->Get(idTile));
 		}
-	}	
+		tiledmap.push_back(spriteline);
+	}
+
+	fs.close();
+}
+
+void CMaps::Add(int id, LPCWSTR texPath, LPCWSTR dataPath, int mapwidth, int mapheight)
+{
+	LPTILEMAP tilemap = new CMap(id, texPath, dataPath, mapwidth, mapheight);
+	maps[id] = tilemap;
+}
+
+CMaps *CMaps::GetInstance()
+{
+	if (__instance == NULL)
+		__instance = new CMaps();
+	return __instance;
+}
+
+void CMap::DrawMap(D3DXVECTOR3 camPosition)
+{
+	int startCol = (int)camPosition.x / 32;
+	int endCol = startCol + 280 / 32 + 1;
+	int numOfRow = tiledmap.size();
+
+	for (int i = 0; i < numOfRow; i++)
+	{
+		for (int j = startCol; j <= endCol; j++)
+		{
+			float x = TILE_WIDTH * (j - startCol) + camPosition.x - (int)camPosition.x % 32;
+			float y = TILE_HEIGHT * i + 22;
+
+			tiledmap[i][j]->Draw(x, y, -1);
+		}
+	}
 }

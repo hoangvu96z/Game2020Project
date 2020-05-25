@@ -1,37 +1,39 @@
 ﻿#pragma once
-
-#include "Utils.h"
-#include "Sprites.h"
+#include <vector>
+#include <string>
+#include <fstream>
+#include <sstream>
 #include "Textures.h"
-#include "Game.h"
+#include "Sprites.h"
 
-#define MAP_SCENCE_1 -10
-
-#define SCREEN_WIDTH 280
-#define SCREEN_HEIGHT 180
-
+#define TILE_WIDTH	32
+#define TILE_HEIGHT	32
 using namespace std;
 
-class CTileMap
+class CMap
 {
+	vector<vector<LPSPRITE>> tiledmap; 
+	int mapWidth;
+	int mapHeight;
+	int mapId;
+public:
+	CMap(int ID, LPCWSTR texPath, LPCWSTR dataPath, int mapwidth, int mapheight);
 
-	int ID;
+	void LoadData(LPCWSTR dataPath);
+	void DrawMap(D3DXVECTOR3 camPosition);
+	void LoadResources(LPCWSTR texPath);
 
-	int tileWidth;
-	int tileHeight;
-
-	int translate_y, translate_x;
-
-	int mapRows; // number of  rows in map matrix
-	int mapColumns; // // number of  columns in map matrix
-
-	int tiledMap[50][100]; // 2 dimensional array for parsing data from file
+	int GetMapWidth() { return mapWidth; }
+	int GetMapHeight() { return mapHeight; }
+};
+typedef CMap* LPTILEMAP;
+class CMaps
+{
+	static CMaps* __instance;
+	unordered_map<int, LPTILEMAP> maps;
 
 public:
-	CGame* game = CGame::GetInstance();
-	CTextures* textures = CTextures::GetInstance();
-
-	CTileMap(LPCWSTR picturePath, int id, int translate_x, int translate_y);
-	void LoadMap(const char* filePath);
-	void DrawMap();
+	void Add(int id, LPCWSTR texPath, LPCWSTR dataPath, int mapwidth, int mapheight);
+	LPTILEMAP Get(int ID) { return maps[ID]; }
+	static CMaps* GetInstance();
 };
