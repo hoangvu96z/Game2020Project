@@ -105,7 +105,6 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			{
 				CPortal* p = dynamic_cast<CPortal*> (e->obj);
 				DebugOut(L"[INFO] Switching to scene %d", p->GetSceneId());
-				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
 			else
 			{
