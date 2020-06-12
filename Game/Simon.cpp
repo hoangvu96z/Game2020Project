@@ -104,7 +104,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			else if (dynamic_cast<CPortal*> (e->obj))
 			{
 				CPortal* p = dynamic_cast<CPortal*> (e->obj);
-				DebugOut(L"[INFO] Switching to scene %d", p->GetSceneId());
+				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
 			else
 			{
@@ -200,6 +200,14 @@ void CSimon::SetState(int state)
 		animation_set->at(SIMON_ANI_SIT_ATTACK)->SetAniStartTime(GetTickCount());
 		break;
 	}
+	case SIMON_STATE_GO_UPSTAIR:
+	{
+		if (nx > 0)
+		{
+			vx = SIMON_GO_UPSTAIR_SPEED;
+			vy = -SIMON_GO_UPSTAIR_SPEED;
+		}
+	}
 	}
 }
 
@@ -215,6 +223,7 @@ void CSimon::Render()
 	else if (state == SIMON_STATE_SIT_ATTACK) ani = SIMON_ANI_SIT_ATTACK;
 	else if (state == SIMON_STATE_JUMP) ani = SIMON_ANI_JUMP;
 	else if (state == SIMON_STATE_SIT) ani = SIMON_ANI_SIT;
+	else if (state == SIMON_STATE_GO_UPSTAIR) ani = SIMON_ANI_GO_UPSTAIR;
 	else
 	{
 		if (vx == 0) ani = SIMON_ANI_IDLE;

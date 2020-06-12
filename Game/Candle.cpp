@@ -4,7 +4,7 @@ CCandle::CCandle()
 {}
 void CCandle::Render()
 {
-	animation_set->at(state)->Render(x, y, nx);
+	animation_set->at(state)->Render(x, y, -1);
 }
 
 // Update Candle
@@ -24,6 +24,17 @@ void CCandle::GetBoundingBox(float& left, float& top, float& right, float& botto
 {
 	left = x;
 	top = y;
-	right = x + CANDLE_BBOX_WIDTH;
-	bottom = y + CANDLE_BBOX_HEIGHT;
+	switch (state)
+	{
+		case CANDLE_STATE_BIG:
+		{
+			right = x + CANDLE_BIG_BBOX_WIDTH;
+			bottom = y + CANDLE_BIG_BBOX_HEIGHT;
+		}
+		case CANDLE_STATE_SMALL:
+		{
+			right = x + CANDLE_SMALL_BBOX_WIDTH;
+			bottom = y + CANDLE_SMALL_BBOX_HEIGHT;
+		}
+	}
 }

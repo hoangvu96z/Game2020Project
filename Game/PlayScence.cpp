@@ -33,6 +33,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_ITEM_CHAIN			5
 #define OBJECT_TYPE_ITEM_DAGGER			6
 #define OBJECT_TYPE_DAGGER					7
+#define SCENE_SECTION_TILE_MAP				7
+#define OBJECT_TYPE_BLACK_KNIGHT		8
 #define OBJECT_TYPE_PORTAL	50
 
 #define MAX_SCENE_LINE 1024
@@ -47,6 +49,11 @@ void CPlayScene::_ParseSection_TEXTURES(string line)
 	int R = atoi(tokens[2].c_str());
 	int G = atoi(tokens[3].c_str());
 	int B = atoi(tokens[4].c_str());
+	if (texID == MAP_ID)
+	{
+		this->mapWidth = atoi(tokens[5].c_str());
+		this->offset_y = atoi(tokens[6].c_str());
+	}
 	CTextures::GetInstance()->Add(texID, path.c_str(), D3DCOLOR_XRGB(R, G, B));
 	
 }
@@ -145,7 +152,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_CANDLE: 
 	{
 		 int it = atoi(tokens[4].c_str());
+		 int state = atoi(tokens[5].c_str());
 		obj = new CCandle();	
+		obj->SetState(state);
 		obj->SetItemId(it);		
 		break;
 	}
@@ -168,6 +177,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		CItems::GetInstance()->AddItem((int)CGameObject::ItemType::DAGGER, obj);
 		break;
 	}	
+	case OBJECT_TYPE_BLACK_KNIGHT: obj = new CBlack_Knight(); break;
 
 	
 	case OBJECT_TYPE_PORTAL:
@@ -208,16 +218,27 @@ void CPlayScene::Load()
 
 		if (line[0] == '#') continue;	// skip comment lines	
 
-		if (line == "[TEXTURES]") { section = SCENE_SECTION_TEXTURES; continue; }
+		if (line == "[TEXTURES]") { 
+			section = SCENE_SECTION_TEXTURES; continue; 
+		}
 		if (line == "[SPRITES]") { 
-			section = SCENE_SECTION_SPRITES; continue; }
+			section = SCENE_SECTION_SPRITES; continue; 
+		}
 		if (line == "[ANIMATIONS]") { 
-			section = SCENE_SECTION_ANIMATIONS; continue; }
+			section = SCENE_SECTION_ANIMATIONS; continue; 
+		}
 		if (line == "[ANIMATION_SETS]") { 
-			section = SCENE_SECTION_ANIMATION_SETS; continue; }
+			section = SCENE_SECTION_ANIMATION_SETS; continue; 
+		}
 		if (line == "[OBJECTS]") { 
-			section = SCENE_SECTION_OBJECTS; continue; }
-		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
+			section = SCENE_SECTION_OBJECTS; continue; 
+		}
+		if (line == "[TILE_MAP]") {
+			section = SCENE_SECTION_TILE_MAP; continue;
+		}
+		if (line[0] == '[') { 
+			section = SCENE_SECTION_UNKNOWN; continue; 
+		}	
 
 		//
 		// data section
@@ -228,6 +249,7 @@ void CPlayScene::Load()
 			case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
 			case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 			case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
+			case SCENE_SECTION_TILE_MAP:_ParseSection_TILE_MAP(line); break;
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 		}
 	}
@@ -238,7 +260,6 @@ void CPlayScene::Load()
 
 	DebugOut(L"[INFO] Done loading scene resources %s\n", sceneFilePath);
 
-	tilemaps->Add(MAP_1, MAP_1_TEX_PATH, MAP_1_MATRIX_PATH, MAP_1_WIDTH, MAP_1_HEIGHT);
 }
 
 
@@ -260,11 +281,12 @@ void CPlayScene::Update(DWORD dt){
 		objects[i]->Update(dt, &coObjects);
 	}
 
+	if (player == NULL) return;
+
 	// Update camera to follow simon
 	float cx, cy;
 	player->GetPosition(cx, cy);
-	int mapWidth = CMaps::GetInstance()->Get(MAP_1)->GetMapWidth();
-	if ( cx>mapWidth-SCREEN_WIDTH/2-32)
+	if (cx > mapWidth - SCREEN_WIDTH / 2)
 	{
 		return;
 	}
@@ -278,7 +300,10 @@ void CPlayScene::Update(DWORD dt){
 void CPlayScene::Render()
 {
 	// Render map
-	 tilemaps->Get(MAP_1)->DrawMap(CGame::GetInstance()->GetCamPos());
+	for (int i = 0; i < tiledMap.size(); i++)
+	{
+		tiledMap[i]->Render();
+	}
 	for (int i = objects.size()-1; i >=0;i--) // Simon is rendered at the last 
 	{
 		if (objects[i]->visible == false)
@@ -287,23 +312,55 @@ void CPlayScene::Render()
 	}
 }
 
+void CPlayScene::_ParseSection_TILE_MAP(string line)
+{
+	LPDIRECT3DTEXTURE9 tilesheet = CTextures::GetInstance()->Get(MAP_ID);
+	D3DSURFACE_DESC surfaceDesc;
+	int level = 0;
+	tilesheet->GetLevelDesc(level, &surfaceDesc);
+
+	//int nums_rowToRead = surfaceDesc.Height / TILE_HEIGHT;
+	int nums_colToRead = surfaceDesc.Width / TILE_WIDTH;
+
+	vector<string> tokens = split(line);
+
+	for (int i = 0; i < tokens.size(); i++)
+	{
+		RECT rectTile;
+		int index = atoi(tokens[i].c_str());
+		rectTile.left = (index % nums_colToRead) * TILE_WIDTH;
+		rectTile.top = (index / nums_colToRead) * TILE_HEIGHT;
+		rectTile.right = rectTile.left + TILE_WIDTH;
+		rectTile.bottom = rectTile.top + TILE_HEIGHT;
+		int x, y;
+		x = i * TILE_WIDTH;
+		y = this->offset_y;
+		CTile* tile = new CTile(x, y, rectTile.left, rectTile.top, rectTile.right, rectTile.bottom);
+		tiledMap.push_back(tile);
+	}
+	this->offset_y += TILE_HEIGHT;
+}
+
 /*
 	Unload current scene
 */
 void CPlayScene::Unload()
 {
 	for (int i = 0; i < objects.size(); i++)
+	{
 		delete objects[i];
+	}
 
 	objects.clear();
 	player = NULL;
+	int currentMapId = CGame::GetInstance()->GetCurrentScene()->GetSceneId() * 100;
 }
 
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
 	DebugOut(L"KeyDown: %d\n", KeyCode);
 
-	CSimon *simon = ((CPlayScene*)scence)->GetPlayer();
+	CSimon *simon = ((CPlayScene *)scence)->GetPlayer();
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
@@ -319,7 +376,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_S: // Attack
 		// If Simon's state attack is not end, then continue
 		if ((simon->GetState() == SIMON_STATE_ATTACK ||
-			simon->GetState() == SIMON_STATE_SIT_ATTACK))
+			 simon->GetState() == SIMON_STATE_SIT_ATTACK))
 			return;
 
 		if (simon->GetState() == SIMON_STATE_IDLE ||
@@ -345,6 +402,14 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 
 	case DIK_A: // reset
 		simon->Reset();
+		break;
+
+	case DIK_2:
+		CGame::GetInstance()->SwitchScene(2);
+		break;
+
+	case DIK_3:
+		CGame::GetInstance()->SwitchScene(3);
 		break;
 	}
 }
@@ -385,7 +450,8 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	else if (game->IsKeyDown(DIK_DOWN))
 		simon->SetState(SIMON_STATE_SIT);
-
+	else if (game->IsKeyDown(DIK_UP))
+		simon->SetState(SIMON_STATE_GO_UPSTAIR);
 	else
 		simon->SetState(SIMON_STATE_IDLE);
 }
