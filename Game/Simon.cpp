@@ -245,3 +245,11 @@ void CSimon::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	right = x + SIMON_BBOX_WIDTH;
 	bottom = y+ SIMON_BBOX_HEIGHT;
 }
+
+CSimon* CSimon::__instance = NULL;
+CSimon* CSimon::GetInstance()
+{
+	if (__instance == NULL) __instance = new CSimon();
+	__instance->visible = true;
+	return __instance;
+}

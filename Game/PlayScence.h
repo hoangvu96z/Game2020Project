@@ -11,6 +11,7 @@
 #include "Items.h"
 #include "BHeart_Items.h"
 #include "Chain_Items.h"
+#include "HUD.h"
 #include "Portal.h"
 #include "BlackKnight_Enemy.h"
 #include "Dagger_Items.h"
@@ -47,11 +48,9 @@ protected:
 	vector<LPGAMEOBJECT> objects;
 	int mapWidth, offset_y;
 	vector<LPTILE> tiledMap;
+	HUD* HUD;
 
-	void _ParseSection_TEXTURES(string line);
-	void _ParseSection_SPRITES(string line);
-	void _ParseSection_ANIMATIONS(string line);
-	void _ParseSection_ANIMATION_SETS(string line);
+	void _ParseSection_MAP_INFO(string line);
 	void _ParseSection_OBJECTS(string line);
 	void _ParseSection_TILE_MAP(string line);
 

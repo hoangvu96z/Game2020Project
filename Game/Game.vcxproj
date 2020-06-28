@@ -125,13 +125,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animations.cpp" />
+    <ClCompile Include="Bat.cpp" />
     <ClCompile Include="BHeart_Items.cpp" />
     <ClCompile Include="BlackKnight_Enemy.cpp" />
+    <ClCompile Include="Boomerang.cpp" />
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="Candle.cpp" />
     <ClCompile Include="Chain_Items.cpp" />
     <ClCompile Include="Dagger.cpp" />
     <ClCompile Include="Dagger_Items.cpp" />
+    <ClCompile Include="DrawCharacters.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="Simon.cpp" />
@@ -148,13 +152,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h" />
+    <ClInclude Include="Bat.h" />
     <ClInclude Include="BHeart_Items.h" />
     <ClInclude Include="BlackKnight_Enemy.h" />
+    <ClInclude Include="Boomerang.h" />
     <ClInclude Include="Brick.h" />
     <ClInclude Include="Candle.h" />
     <ClInclude Include="Chain_Items.h" />
     <ClInclude Include="Dagger.h" />
     <ClInclude Include="Dagger_Items.h" />
+    <ClInclude Include="DrawCharacters.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Items.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="Simon.h" />

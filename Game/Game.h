@@ -15,6 +15,7 @@
 using namespace std;
 
 #define KEYBOARD_BUFFER_SIZE 1024
+#define RESOURCE_FILE_PATH L"Resources.txt"
 
 class CGame
 {
@@ -46,6 +47,10 @@ class CGame
 
 	void _ParseSection_SETTINGS(string line);
 	void _ParseSection_SCENES(string line);
+	void _ParseSection_TEXTURES(string line);
+	void _ParseSection_SPRITES(string line);
+	void _ParseSection_ANIMATIONS(string line);
+	void _ParseSection_ANIMATION_SETS(string line);
 
 public:
 	void InitKeyboard();
@@ -56,7 +61,9 @@ public:
 	int IsKeyDown(int KeyCode);
 	void ProcessKeyboard();
 
-	void Load(LPCWSTR gameFile);
+	void LoadResources();
+	void LoadGameFile(LPCWSTR gameFile);
+	int GetSceneId() { return current_scene; }
 	LPSCENE GetCurrentScene() { return scenes[current_scene]; }
 	void SwitchScene(int scene_id);
 
@@ -83,7 +90,7 @@ public:
 	LPD3DXSPRITE GetSpriteHandler() { return this->spriteHandler; }
 
 	void SetCamPos(float x, float y);
-	D3DXVECTOR3 GetCamPos();
+	void GetCamPos(float& x, float& y);
 
 	static CGame * GetInstance();
 
