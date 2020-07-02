@@ -1,6 +1,0 @@
-﻿  Bat.cpp
-c:\users\vnguyen97\documents\my_projects\game2020project\game\bat.cpp(87): warning C4018: '<': signed/unsigned mismatch
-  Boomerang.cpp
-c:\users\vnguyen97\documents\my_projects\game2020project\game\boomerang.cpp(73): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  Game.vcxproj -> C:\Users\vnguyen97\Documents\My_projects\Game2020Project\Debug\Game.exe
