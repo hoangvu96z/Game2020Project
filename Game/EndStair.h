@@ -3,9 +3,6 @@
 
 class CEndStair : public CGameObject
 {
-	int width;
-	int height;
-
 public:
 	CEndStair(float l, float t, float r, float b);
 	virtual void Render();

@@ -1,7 +1,9 @@
 #include "Dagger.h"
+#include "Candle.h"
 
 CDagger::CDagger() : CGameObject()
 {
+	//this->visible = false;
 	vx = DAGGER_SPEED;
 }
 
@@ -15,13 +17,15 @@ void CDagger::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (nx < 0) vx = -DAGGER_SPEED;
 	else vx = DAGGER_SPEED;
 	vy = 0;
+
 	CGameObject::Update(dt);
-	x += dx;
+
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
 	CalcPotentialCollisions(coObjects, coEvents);
+
 	if (coEvents.size() == 0)
 	{
 		y += dy;
@@ -50,6 +54,7 @@ void CDagger::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
+
 	// clean up collision events
 	for (int i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }

@@ -90,6 +90,12 @@
     <ClCompile Include="Bat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StartStair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EndStair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brick.h">
@@ -165,6 +171,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EndStair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StartStair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

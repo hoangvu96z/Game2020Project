@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{C83A385D-5992-4E1B-B783-AB1D446414D5}</ProjectGuid>
     <RootNamespace>My05ScenceManager</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -135,10 +135,12 @@
     <ClCompile Include="Dagger.cpp" />
     <ClCompile Include="Dagger_Items.cpp" />
     <ClCompile Include="DrawCharacters.cpp" />
+    <ClCompile Include="EndStair.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="Simon.cpp" />
+    <ClCompile Include="StartStair.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -162,10 +164,12 @@
     <ClInclude Include="Dagger.h" />
     <ClInclude Include="Dagger_Items.h" />
     <ClInclude Include="DrawCharacters.h" />
+    <ClInclude Include="EndStair.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Items.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="Simon.h" />
+    <ClInclude Include="StartStair.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Game.h" />

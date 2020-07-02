@@ -120,7 +120,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		float r = atof(tokens[3].c_str());
 		float b = atof(tokens[4].c_str());
-		obj = new CEndStair(x, y, r, b);
+		obj = new CEndStair(x, y, r, b);	
 		break;
 	}
 	case OBJECT_TYPE_ITEM_DAGGER:
