@@ -52,6 +52,9 @@ public:
 	float vx;
 	float vy;
 
+	int width;
+	int height;
+
 	int nx;	 // right =1, lefft =-1
 	int state;
 	bool visible;
@@ -75,7 +78,11 @@ public:
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
 	void GetPosition(float& x, float& y) { x = this->x; y = this->y; }
 
-
+	// Size
+	void SetWidth(int w) { this->width = w; }
+	int GetWidth() { return this->width; }
+	void SetHeight(int h) { this->height = h; }
+	int GetHeight() { return this->height; }
 	// Speed
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }	
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
@@ -114,5 +121,7 @@ public:
 	void SetAnimationSet(LPANIMATION_SET ani_set) { animation_set = ani_set; }
 	CGameObject();
 	~CGameObject();
+	virtual bool IsOverlapping(LPGAMEOBJECT obj);
+	void ReDirect(float positionX);
 	void RenderBoundingBox();
 };

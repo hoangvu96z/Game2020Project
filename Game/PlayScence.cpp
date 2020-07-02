@@ -31,8 +31,11 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_DAGGER					7
 #define OBJECT_TYPE_BLACK_KNIGHT		8
 #define OBJECT_TYPE_PORTAL	50
+#define OBJECT_TYPE_STAIR_BOTTOM	-2
+#define OBJECT_TYPE_STAIR_TOP			-3
 #define SCENE_SECTION_MAP_INFO				7
 #define SCENE_SECTION_TILE_MAP				8
+
 
 #define MAX_SCENE_LINE 1024
 
@@ -65,9 +68,24 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 
-	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
-	case OBJECT_TYPE_WHIP: obj = new CWhip(); break;
-	case OBJECT_TYPE_DAGGER: obj = new CDagger(); break;
+	case OBJECT_TYPE_BRICK:
+	{
+		int width = atoi(tokens[4].c_str());
+		int height = atoi(tokens[5].c_str());
+		obj = new CBrick();
+		obj->SetWidth(width);
+		obj->SetHeight(height);
+		break;
+
+	}
+	//case OBJECT_TYPE_WHIP: obj = new CWhip(); break;
+	case OBJECT_TYPE_DAGGER:
+	{
+		obj = new CDagger();
+		dagger = (CDagger*)obj;
+		obj->visible = false;
+		break;
+	}
 	case OBJECT_TYPE_CANDLE: 
 	{
 		 int it = atoi(tokens[4].c_str());
@@ -88,6 +106,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		 obj = new Chain_Items();
 
 		 CItems::GetInstance()->AddItem((int)CGameObject::ItemType::CHAIN, obj);
+		break;
+	}
+	case OBJECT_TYPE_STAIR_BOTTOM:
+	{
+		float r = atof(tokens[3].c_str());
+		float b = atof(tokens[4].c_str());
+		obj = new CStartStair(x, y, r, b);
+		break;
+	}
+
+	case OBJECT_TYPE_STAIR_TOP:
+	{
+		float r = atof(tokens[3].c_str());
+		float b = atof(tokens[4].c_str());
+		obj = new CEndStair(x, y, r, b);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_DAGGER:
@@ -234,9 +267,9 @@ void CPlayScene::Render()
 
 void CPlayScene::_ParseSection_TILE_MAP(string line)
 {
-	LPDIRECT3DTEXTURE9 tilesheet = CTextures::GetInstance()->Get(MAP_ID);
 	D3DSURFACE_DESC surfaceDesc;
 	int cureneMapId = (CGame::GetInstance()->GetSceneId());
+	LPDIRECT3DTEXTURE9 tilesheet = CTextures::GetInstance()->Get(cureneMapId);
 	int level = 0;
 	tilesheet->GetLevelDesc(level, &surfaceDesc);
 
@@ -284,6 +317,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	DebugOut(L"KeyDown: %d\n", KeyCode);
 
 	CSimon *simon = ((CPlayScene *)scence)->GetPlayer();
+	CDagger *dagger = ((CPlayScene*)scence)->GetDagger();
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
@@ -297,7 +331,21 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	}
 	case DIK_S: // Attack
-		// If Simon's state attack is not end, then continue
+	{			// If Simon's state attack is not end, then continue
+		if (CGame::GetInstance()->IsKeyDown(DIK_UP)) // Sub weapon attack
+		{
+			if (simon->subWeapon == false)
+				return;
+			if (simon->GetState() == SIMON_STATE_THROW && dagger->visible == true)
+				return;
+
+			float xS, yS;
+			simon->GetPosition(xS, yS);
+			dagger->SetPosition(xS, yS);
+			dagger->SetOrientation(simon->nx);
+			dagger->SetVisible(true);
+			simon->SetState(SIMON_STATE_THROW);
+		}
 		if ((simon->GetState() == SIMON_STATE_ATTACK ||
 			 simon->GetState() == SIMON_STATE_SIT_ATTACK))
 			return;
@@ -312,14 +360,11 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			simon->SetState(SIMON_STATE_SIT_ATTACK);
 		}
 		break;
-
-	case DIK_D: // Sub attack
-	{
-		break;
 	}
 	case DIK_Q: // Upgrade whip
 	{
 		simon->whip->PowerUp();
+		simon->nextSceneWhip->PowerUp();
 		break;
 	}
 
@@ -370,21 +415,48 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	if (simon->GetState() == SIMON_STATE_SIT_ATTACK && 
 		simon->animation_set->at(SIMON_ANI_SIT_ATTACK)->IsOver(SIMON_ATTACK_TIME) == false)
 		return;
+
+	if (simon->GetState() == SIMON_STATE_THROW &&
+		simon->animation_set->at(SIMON_ANI_THROW)->IsOver(SIMON_ATTACK_TIME) == false)
+		return;
     			
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
-		simon->SetOrientation(1);
-		simon->SetState(SIMON_STATE_WALKING);		
+		if (simon->onStairs == 0)
+		{
+			simon->SetOrientation(1);
+			simon->SetState(SIMON_STATE_WALKING);
+		}
+		else
+		{
+			simon->SetOrientation(1);
+			simon->SetState(SIMON_ANI_GO_UPSTAIR);
+		}
 	}	
 
 	else if (game->IsKeyDown(DIK_LEFT))
 	{
-		simon->SetOrientation(-1);
-		simon->SetState(SIMON_STATE_WALKING);
+		if (simon->onStairs == 0)
+		{
+			simon->SetOrientation(-1);
+			simon->SetState(SIMON_STATE_WALKING);
+		}
+		else
+		{
+			simon->SetOrientation(-1);
+			simon->SetState(SIMON_ANI_GO_DOWNSTAIR);
+		}
 	}	
 
 	else if (game->IsKeyDown(DIK_DOWN))
-		simon->SetState(SIMON_STATE_SIT);
+	{
+		if (simon->onStairs != 0)
+		{
+			simon->SetState(SIMON_STATE_GO_DOWNSTAIR);
+		}
+		else  simon->SetState(SIMON_STATE_SIT);
+
+	}
 	else if (game->IsKeyDown(DIK_UP))
 		simon->SetState(SIMON_STATE_GO_UPSTAIR);
 	else

@@ -6,6 +6,11 @@ CWhip::CWhip() : CGameObject()
 {
 }
 
+void CWhip::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+}
+
+
 void CWhip::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	top = y + OFFSET_TOP;
@@ -78,6 +83,13 @@ void CWhip::PowerUp()
 		SetState(SHORT_CHAIN);
 	else if (state == SHORT_CHAIN)
 		SetState(LONG_CHAIN);
+}
+
+CWhip* CWhip::__instance = NULL;
+CWhip* CWhip::GetInstance()
+{
+	if (__instance == NULL) __instance = new CWhip();
+	return __instance;
 }
 
 void CWhip::Render(int currentFrame)

@@ -16,25 +16,12 @@
 #include "BlackKnight_Enemy.h"
 #include "Dagger_Items.h"
 #include "Dagger.h"
+#include "StartStair.h"
+#include "EndStair.h"
+#include<vector>
 
 #define SCREEN_WIDTH	 250
 #define SCREEN_HEIGHT 230
-
-#define MAP_1					100
-#define MAP_1_WIDTH		768
-#define MAP_1_HEIGHT		192
-#define MAP_1_MARGIN		22
-
-#define MAP_2					200
-#define MAP_2_WIDTH		300
-#define MAP_2_HEIGHT		193
-#define MAP_2_MARGIN		-6
-
-#define MAP_1_TEX_PATH  L"resources\\tilesheet1.png"
-#define MAP_1_MATRIX_PATH  L"resources\\matrix1.txt"
-
-#define MAP_2_TEX_PATH  L"resources\\tilesheet2.png"
-#define MAP_2_MATRIX_PATH  L"resources\\matrix2.txt"
 
 #define TILE_WIDTH	32
 #define TILE_HEIGHT	32
@@ -61,7 +48,9 @@ public:
 	virtual void Render();
 	virtual void Unload();
 	friend class CPlayScenceKeyHandler;
+
 	CSimon* GetPlayer() { return player; }
+	CDagger* GetDagger() { return dagger; }
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
