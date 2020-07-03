@@ -23,6 +23,7 @@
 #define SIMON_STATE_DEFLECT							10
 #define SIMON_STATE_IDLE_UPSTAIR					11
 #define SIMON_STATE_IDLE_DOWNSTAIR			12
+#define SIMON_STATE_THROW							13
 
 #define SIMON_STATE_DIE						400
 
@@ -30,24 +31,20 @@
 #define SIMON_ANI_WALKING	1
 #define SIMON_ANI_JUMP			2
 #define SIMON_ANI_SIT				3
-
 #define SIMON_ANI_ATTACK				4
 #define SIMON_ANI_SIT_ATTACK		5
-
 #define SIMON_ANI_GO_UPSTAIR						6
 #define SIMON_ANI_GO_DOWNSTAIR				7
 #define SIMON_ANI_ATTACK_UPSTAIR				8
 #define SIMON_ANI_ATTACK_DOWNSTAIR		9
-#define SIMON_STATE_THROW							13
 
 #define SIMON_ANI_DEFLECT							10
 
-#define SIMON_ANI_IDLE_UPSTAIR	11
-#define SIMON_ANI_IDLE_DOWNSTAIR	12
 #define SIMON_ANI_IDLE_UPSTAIR		11
+#define SIMON_ANI_IDLE_DOWNSTAIR	12
 #define SIMON_ANI_THROW					13
 
-#define SIMON_GRAVITY						0.0005f	
+#define SIMON_GRAVITY						0.0004f	
 #define SIMON_WALKING_SPEED			0.06f
 #define SIMON_JUMP_SPEED_Y				0.18f
 #define SIMON_GO_UPSTAIR_SPEED		0.03f
@@ -74,9 +71,11 @@ class CSimon : public CGameObject
 public:
 	int onStairs;
 	LPWHIP whip;	
-	LPWHIP nextSceneWhip;
+	//LPWHIP nextSceneWhip;
 	CDagger* dagger;
 
+	bool enemiesActived = false;
+	bool subWeapon = false;
 	bool isStanding;
 	bool autoMove;
 	AutoMoveInfo autoMoveInfo;
@@ -89,13 +88,13 @@ public:
 	void Render();
 	void SetState(int state);	
 	void Reset();
-	bool isOnGround() { return vy == 0; }	
-	bool subWeapon = false;
+	bool isOnGround() { return vy == 0; }
 
 	static CSimon* GetInstance();
 
 	void GoUpStair();
 	void GoDownStair();
+	bool ActiveEnemies() { return enemiesActived; }
 	void ProceedOnStairs();
 	vector<LPGAMEOBJECT> ovObjects;		// overlapping objects
 	void StartAutoMove(float vx, float xDestination);

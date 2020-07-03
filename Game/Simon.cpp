@@ -7,11 +7,8 @@ CSimon::CSimon(float x, float y) :CGameObject()
 	start_y = y;
 	this->x = x;
 	this->y = y;
-	this->autoMove = false;
 	SetState(SIMON_STATE_IDLE);
-	nextSceneWhip  = CWhip::GetInstance();
 	whip = new CWhip();
-	whip->SetState(nextSceneWhip->GetState());
 }
 
 void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
@@ -27,18 +24,6 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	vector <LPCOLLISIONEVENT> coEvents;
 	vector <LPCOLLISIONEVENT> coEventsResult;
 
-	// Overlapping
-	ovObjects.clear();
-	for (UINT i = 0; i < coObjects->size(); ++i)
-		if (this->IsOverlapping(coObjects->at(i)))
-			ovObjects.push_back(coObjects->at(i));
-	
-	// Being On Stairs
-	if (onStairs != 0)
-	{
-		ProceedOnStairs();	
-		vy = 0;
-	}
 	// turn off collision when simon is die
 	if (state != SIMON_STATE_DIE)
 	{
@@ -59,7 +44,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
-		x += min_tx * dx;
+		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
 
 		/*
@@ -78,7 +63,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			// Collision logic with Brick 
 			else if (dynamic_cast<CBrick*>(e->obj))
 			{
-				if (e->ny !=0) vy = 0;
+				if (e->ny !=0) vy = 0;				
 			}
 
 			else if (dynamic_cast<BHeart_Items*>(e->obj))
@@ -94,29 +79,16 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				{
 					e->obj->SetVisible(false);
 					this->whip->PowerUp();
-					this->nextSceneWhip->PowerUp();
 				}
 			}
 			else if (dynamic_cast<Dagger_Items*>(e->obj))
 			{
-				DebugOut(L"[ITEMS] Dagger Collected \n");
 				if (e->nx != 0 || e->ny != 0)
 				{
 					e->obj->SetVisible(false);
 				}
 			}
-			else if (dynamic_cast<CStartStair*> (e->obj))
-			{
-				if (e->nx != 0) x += dx;
-				if (e->ny != 0) y += dy;
-	
-			}
-			else if (dynamic_cast<CEndStair*> (e->obj))
-			{
-				if (e->nx != 0) x += dx;
-				if (e->ny != 0) y += dy;
 
-			}
 			// switching scene logic		
 			else if (dynamic_cast<CPortal*> (e->obj))
 			{
@@ -165,7 +137,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	
 }
 void CSimon::SetState(int state)
-{
+{	
 	CGameObject::SetState(state);
 	switch (state)
 	{
@@ -177,12 +149,12 @@ void CSimon::SetState(int state)
 		}
 		case SIMON_STATE_WALKING:
 		{
-			if (nx > 0)
+			if (nx > 0) 
 				vx = SIMON_WALKING_SPEED;
-			else
+			else 
 				vx = -SIMON_WALKING_SPEED;
 			break;
-		}
+		}	
 		case SIMON_STATE_DIE:
 		{
 			vy = -SIMON_DIE_DEFLECT_SPEED;
@@ -191,7 +163,7 @@ void CSimon::SetState(int state)
 		case SIMON_STATE_JUMP:
 		{
 			isStanding = true;
-			vy = -SIMON_JUMP_SPEED_Y;
+			vy = -SIMON_JUMP_SPEED_Y;			
 			break;
 		}
 		case SIMON_STATE_SIT:
@@ -213,6 +185,15 @@ void CSimon::SetState(int state)
 			animation_set->at(SIMON_ANI_SIT_ATTACK)->SetAniStartTime(GetTickCount());
 			break;
 		}
+
+		case SIMON_STATE_THROW:
+		{
+			vx = 0;
+			animation_set->at(SIMON_ANI_THROW)->Reset();
+			animation_set->at(SIMON_ANI_THROW)->SetAniStartTime(GetTickCount());
+			break;
+		}
+
 		case SIMON_STATE_GO_UPSTAIR:
 		{
 			GoUpStair();
@@ -228,7 +209,6 @@ void CSimon::SetState(int state)
 
 void CSimon::Reset()
 {
-	onStairs = 0;
 	SetState(SIMON_STATE_IDLE);
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
@@ -244,56 +224,59 @@ void CSimon::Render()
 	}
 	else if (state == SIMON_STATE_ATTACK)
 	{
-		if (onStairs != 0)
+		if (onStairs == 1)
 		{
 			ani = SIMON_ANI_ATTACK_UPSTAIR;
 		}
-		else
+		else if (onStairs == -1)
 		{
-			ani = SIMON_ANI_ATTACK;
+			ani = SIMON_ANI_ATTACK_DOWNSTAIR;
 		}
+		else ani = SIMON_ANI_ATTACK;
 	}
-	else if (state == SIMON_STATE_SIT_ATTACK)
+	else if (state == SIMON_STATE_SIT_ATTACK) 
 		ani = SIMON_ANI_SIT_ATTACK;
-	else if (state == SIMON_STATE_JUMP)
+	else if (state == SIMON_STATE_THROW) 
+		ani = SIMON_ANI_THROW;
+	else if (state == SIMON_STATE_JUMP) 
 		ani = SIMON_ANI_JUMP;
-	else if (state == SIMON_STATE_SIT)
+	else if (state == SIMON_STATE_SIT) 
 		ani = SIMON_ANI_SIT;
 	// else if (state == SIMON_STATE_GO_UPSTAIR) ani = SIMON_ANI_GO_UPSTAIR;
 	else if (onStairs != 0)
 	{
 		if (vx != 0)
 		{
-			if (onStairs == 1)
+			if (onStairs == 1) 
 				ani = SIMON_ANI_GO_UPSTAIR;
-			else if (onStairs == -1)
+			else if (onStairs == -1) 
 				ani = SIMON_ANI_GO_DOWNSTAIR;
 		}
 		else
 		{
-			if (onStairs == 1)
+			if (onStairs == 1) 
 				ani = SIMON_ANI_IDLE_UPSTAIR;
-			else if (onStairs == -1)
+			else if (onStairs == -1) 
 				ani = SIMON_ANI_IDLE_DOWNSTAIR;
 		}
 	}
 	else
 	{
-		if (vx == 0)
+		if (vx == 0) 
 			ani = SIMON_ANI_IDLE;
-		else
+		else	
 			ani = SIMON_ANI_WALKING;
 	}
 
 	int alpha = 255;
 	animation_set->at(ani)->Render(x, y, nx, alpha);
-	if (state == SIMON_STATE_ATTACK || state == SIMON_STATE_SIT_ATTACK)
+	if (state == SIMON_STATE_ATTACK || state == SIMON_STATE_SIT_ATTACK) 
 	{
 		whip->Render(animation_set->at(ani)->GetCurrentFrame());
 	}
 }
 
-void CSimon::GetBoundingBox(float &left, float &top, float &right, float &bottom)
+void CSimon::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x;
 	top = y;
@@ -303,7 +286,7 @@ void CSimon::GetBoundingBox(float &left, float &top, float &right, float &bottom
 CSimon *CSimon::__instance = NULL;
 CSimon *CSimon::GetInstance()
 {
-	if (__instance == NULL)
+	if (__instance == NULL) 
 		__instance = new CSimon();
 	__instance->visible = true;
 	return __instance;

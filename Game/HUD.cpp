@@ -7,7 +7,7 @@ void HUD::Render()
 
 	CGame* game = CGame::GetInstance();
 	float cx, cy;
-	game->GetCamPos(cx, cy);
+	//game->GetCamPos(cx, cy);
 
 	sprites->Get(80000)->Draw(cx, cy + 2, -1);
 	code->DrawNumber(4, cx + 150, cy + 8, time);
