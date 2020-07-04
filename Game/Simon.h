@@ -81,21 +81,21 @@ public:
 	AutoMoveInfo autoMoveInfo;
 
 	CSimon(float x=0.0f, float y =0.0f);
-
+	
 	virtual void Update(DWORD dt, vector <LPGAMEOBJECT>* coObject = NULL);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
 	void Render();
 	void SetState(int state);	
 	void Reset();
-	bool isOnGround() { return vy == 0; }
+	bool isOnGround() { return vy == 0; }	
 
 	static CSimon* GetInstance();
 
 	void GoUpStair();
 	void GoDownStair();
-	bool ActiveEnemies() { return enemiesActived; }
 	void ProceedOnStairs();
 	vector<LPGAMEOBJECT> ovObjects;		// overlapping objects
 	void StartAutoMove(float vx, float xDestination);
+	bool ActiveEnemies() { return enemiesActived; }
 };

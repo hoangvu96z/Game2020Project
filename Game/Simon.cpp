@@ -7,8 +7,11 @@ CSimon::CSimon(float x, float y) :CGameObject()
 	start_y = y;
 	this->x = x;
 	this->y = y;
+	this->autoMove = false;
+	enemiesActived = false;
 	SetState(SIMON_STATE_IDLE);
-	whip = new CWhip();
+    whip = new CWhip();
+	dagger = new CDagger();
 }
 
 void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
@@ -16,6 +19,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	// Calculate x,y
 	CGameObject::Update(dt);
 	whip->Update(dt, coObjects);
+	dagger->Update(dt, coObjects);
 
 	// Simple fall down
 	vy += SIMON_GRAVITY * dt;
@@ -24,6 +28,18 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	vector <LPCOLLISIONEVENT> coEvents;
 	vector <LPCOLLISIONEVENT> coEventsResult;
 
+	// Overlapping
+	ovObjects.clear();
+	for (UINT i = 0; i < coObjects->size(); ++i)
+		if (this->IsOverlapping(coObjects->at(i)))
+			ovObjects.push_back(coObjects->at(i));
+	
+	// Being On Stairs
+	if (onStairs != 0)
+	{
+		ProceedOnStairs();	
+		vy = 0;
+	}
 	// turn off collision when simon is die
 	if (state != SIMON_STATE_DIE)
 	{
@@ -63,11 +79,24 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			// Collision logic with Brick 
 			else if (dynamic_cast<CBrick*>(e->obj))
 			{
-				if (e->ny !=0) vy = 0;				
+				if (onStairs == 0)
+				{
+					if (e->ny != 0)
+					{
+						if (e->ny == -1) vy = 0; // simon standing on brick
+						else 	y += dy; //simon can jump through brick
+					}
+				}
+				else  //Turn off collision with brick when simon is on stairs
+				{							
+					x += dx;
+					y += dy;
+				}
+					
 			}
-
 			else if (dynamic_cast<BHeart_Items*>(e->obj))
 			{
+				DebugOut(L"[ITEMS] Heart Collected \n");
 				if (e->nx != 0 || e->ny != 0)
 				{					
 					e->obj->SetVisible(false);
@@ -86,7 +115,19 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				if (e->nx != 0 || e->ny != 0)
 				{
 					e->obj->SetVisible(false);
+					subWeapon = true;
 				}
+			}
+			else if (dynamic_cast<CStartStair*> (e->obj))
+			{
+				if (e->nx != 0) x += dx;
+				if (e->ny != 0) y += dy;
+			}
+
+			else if (dynamic_cast<CEndStair*> (e->obj))
+			{
+				if (e->nx != 0) x += dx;
+				if (e->ny != 0) y += dy;
 			}
 
 			// switching scene logic		
@@ -98,7 +139,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			else
 			{
 				if (nx != 0) vx = 0;
-				if (ny != 0) vy = 0;				
+				if (ny != 0) vy = 0;			
 			}
 		}
 	}
@@ -141,74 +182,75 @@ void CSimon::SetState(int state)
 	CGameObject::SetState(state);
 	switch (state)
 	{
-		case SIMON_STATE_IDLE:
-		{
-			isStanding = true;
-			vx = 0;
-			break;
-		}
-		case SIMON_STATE_WALKING:
-		{
-			if (nx > 0) 
-				vx = SIMON_WALKING_SPEED;
-			else 
-				vx = -SIMON_WALKING_SPEED;
-			break;
-		}	
-		case SIMON_STATE_DIE:
-		{
-			vy = -SIMON_DIE_DEFLECT_SPEED;
-			break;
-		}
-		case SIMON_STATE_JUMP:
-		{
-			isStanding = true;
-			vy = -SIMON_JUMP_SPEED_Y;			
-			break;
-		}
-		case SIMON_STATE_SIT:
-		{
-			isStanding = false;
-			vx = 0;
-			vy = 0;
-			break;
-		}
-		case SIMON_STATE_ATTACK:
-		{
-			animation_set->at(SIMON_ANI_ATTACK)->Reset();
-			animation_set->at(SIMON_ANI_ATTACK)->SetAniStartTime(GetTickCount());
-			break;
-		}
-		case SIMON_STATE_SIT_ATTACK:
-		{
-			animation_set->at(SIMON_ANI_SIT_ATTACK)->Reset();
-			animation_set->at(SIMON_ANI_SIT_ATTACK)->SetAniStartTime(GetTickCount());
-			break;
-		}
+	case SIMON_STATE_IDLE:
+	{
+		isStanding = true;
+		vx = 0;
+		break;
+	}
+	case SIMON_STATE_WALKING:
+	{
+		if (nx > 0) 
+			vx = SIMON_WALKING_SPEED;
+		else 
+			vx = -SIMON_WALKING_SPEED;
+		break;
+	}	
+	case SIMON_STATE_DIE:
+	{
+		vy = -SIMON_DIE_DEFLECT_SPEED;
+		break;
+	}
+	case SIMON_STATE_JUMP:
+	{
+		isStanding = true;
+		vy = -SIMON_JUMP_SPEED_Y;			
+		break;
+	}
+	case SIMON_STATE_SIT:
+	{
+		isStanding = false;
+		vx = 0;
+		vy = 0;
+		break;
+	}
+	case SIMON_STATE_ATTACK:
+	{
+		animation_set->at(SIMON_ANI_ATTACK)->Reset();
+		animation_set->at(SIMON_ANI_ATTACK)->SetAniStartTime(GetTickCount());
+		break;
+	}
+	case SIMON_STATE_SIT_ATTACK:
+	{
+		animation_set->at(SIMON_ANI_SIT_ATTACK)->Reset();
+		animation_set->at(SIMON_ANI_SIT_ATTACK)->SetAniStartTime(GetTickCount());
+		break;
+	}
 
-		case SIMON_STATE_THROW:
-		{
-			vx = 0;
-			animation_set->at(SIMON_ANI_THROW)->Reset();
-			animation_set->at(SIMON_ANI_THROW)->SetAniStartTime(GetTickCount());
-			break;
-		}
+	case SIMON_STATE_THROW:
+	{
+		vx = 0;
+		animation_set->at(SIMON_ANI_THROW)->Reset();
+		animation_set->at(SIMON_ANI_THROW)->SetAniStartTime(GetTickCount());
+		break;
+	}
 
-		case SIMON_STATE_GO_UPSTAIR:
-		{
-			GoUpStair();
-			break;
-		}
-		case SIMON_STATE_GO_DOWNSTAIR:
-		{
-			GoDownStair();
-			break;
-		}
+	case SIMON_STATE_GO_UPSTAIR:
+	{
+		GoUpStair();
+		break;
+	}
+	case SIMON_STATE_GO_DOWNSTAIR:
+	{
+		GoDownStair();
+		break;
+	}
 	}
 }
 
 void CSimon::Reset()
 {
+	onStairs = 0;
 	SetState(SIMON_STATE_IDLE);
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
@@ -267,7 +309,7 @@ void CSimon::Render()
 		else	
 			ani = SIMON_ANI_WALKING;
 	}
-
+	
 	int alpha = 255;
 	animation_set->at(ani)->Render(x, y, nx, alpha);
 	if (state == SIMON_STATE_ATTACK || state == SIMON_STATE_SIT_ATTACK) 
@@ -286,9 +328,8 @@ void CSimon::GetBoundingBox(float& left, float& top, float& right, float& bottom
 CSimon *CSimon::__instance = NULL;
 CSimon *CSimon::GetInstance()
 {
-	if (__instance == NULL) 
+	if (__instance == NULL)
 		__instance = new CSimon();
-	__instance->visible = true;
 	return __instance;
 }
 
@@ -303,10 +344,10 @@ void CSimon::GoUpStair()
 		for (UINT i = 0; i < ovObjects.size(); ++i)
 		{
 			if (dynamic_cast<CStartStair *>(ovObjects[i]))
-			{
+			{				
 				stairs = ovObjects[i];
 				break;
-			}
+			}		
 		}
 
 		// Do nothing if there is no stairs overlapped
@@ -322,9 +363,9 @@ void CSimon::GoUpStair()
 		nx = stairs->GetOrientation();
 		this->vx = nx * SIMON_GO_UPSTAIR_SPEED;
 		this->vy = -SIMON_GO_UPSTAIR_SPEED;
-		onStairs = 1;
+		onStairs = 1;		
 	}
-	else
+	else 
 	{
 		if (onStairs == -1) // Simon is going down stair and want to go back
 		{
@@ -349,7 +390,7 @@ void CSimon::ProceedOnStairs()
 				break;
 			}
 
-		if (stairs == NULL)
+		if (stairs == NULL) 
 			return;
 
 		float xS, yS;
@@ -395,7 +436,7 @@ void CSimon::GoDownStair()
 	{
 		LPGAMEOBJECT stairs = NULL;
 
-		// Check if Simon is on a stairs-start
+		// Check if Simon is on a stairs-start 
 		for (UINT i = 0; i < ovObjects.size(); ++i)
 		{
 			if (dynamic_cast<CEndStair *>(ovObjects[i]))
