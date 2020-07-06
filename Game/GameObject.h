@@ -10,7 +10,7 @@
 using namespace std;
 
 #define ID_TEX_BBOX		-100		
-#define ITEM_GRAVITY	0.004f
+#define ITEM_GRAVITY	0.0018f
 
 class CGameObject; 
 typedef CGameObject * LPGAMEOBJECT;
@@ -62,10 +62,12 @@ public:
 
 	enum class ItemType
 	{
-		UNKNOWN =	-1,
-		BIG_HEART	=	4,
-		CHAIN			=	5,
-		DAGGER		=	6
+		UNKNOWN = -1,
+		BIG_HEART =	4,
+		CHAIN =	5,
+		DAGGER = 6,
+		BOOMERANG = 61,
+		MONEY_POCKET = 10
 	}; 
 
 	DWORD dt; 

@@ -103,14 +103,13 @@ void CGame::SetCamPos(float x, float y)
 {
 	cam_x = x;
 	cam_y = y;
-	if (cam_x <0) cam_x = 0;		
-	if (cam_y < 0) cam_y = 0;	
+	if (cam_x < 0) cam_x = 0;
+	if (cam_y < 0) cam_y = 0;
 }
 
-void CGame::GetCamPos(float&x, float &y)
+D3DXVECTOR3 CGame::GetCamPos()
 {
-	x = cam_x;
-	y = cam_y;
+	return D3DXVECTOR3(cam_x, cam_y, 0);
 }
 
 int CGame::IsKeyDown(int KeyCode)
@@ -377,8 +376,6 @@ void CGame::_ParseSection_SCENES(string line)
 */
 void CGame::LoadGameFile(LPCWSTR gameFile)
 {
-	DebugOut(L"[INFO] Start loading game file : %s\n", gameFile);
-
 	ifstream f;
 	f.open(gameFile);
 	char str[MAX_GAME_LINE];
