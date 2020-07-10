@@ -7,8 +7,7 @@ CSimon::CSimon(float x, float y) :CGameObject()
 	start_y = y;
 	this->x = x;
 	this->y = y;
-	this->autoMove = false;
-	enemiesActived = false;
+
 	SetState(SIMON_STATE_IDLE);
     whip = new CWhip();
 	dagger = new CDagger();
@@ -25,6 +24,20 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	vy += SIMON_GRAVITY * dt;
 	// Simple logic with screen edge
 	if (vx < 0 && x < 0) x = 0;
+
+	if (powerUp)
+	{
+		if (discolorationTime < SIMON_DISCOLOR_TIME)
+		{
+			vx = 0;
+			discolorationTime += dt;
+		}			
+		else
+		{
+			powerUp = false;
+			discolorationTime = 0;
+		}
+	}
 	vector <LPCOLLISIONEVENT> coEvents;
 	vector <LPCOLLISIONEVENT> coEventsResult;
 
@@ -79,6 +92,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			// Collision logic with Brick 
 			else if (dynamic_cast<CBrick*>(e->obj))
 			{
+				onMovingPlatform = false;
 				if (onStairs == 0)
 				{
 					if (e->ny != 0)
@@ -94,6 +108,15 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				}
 					
 			}
+			// Collision logic when Simon is on theMoving Platform
+			else if (dynamic_cast<CMovingPlatform*>(e->obj))
+			{
+				if (e->nx != 0) x += dx;
+				CMovingPlatform* m = dynamic_cast<CMovingPlatform*> (e->obj);
+				onMovingPlatform = true;
+				this->vx = m->vx;
+				vy = 0;
+			}
 			else if (dynamic_cast<BHeart_Items*>(e->obj))
 			{
 				DebugOut(L"[ITEMS] Heart Collected \n");
@@ -106,8 +129,9 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			{
 				if (e->nx != 0 || e->ny != 0)
 				{
+					this->powerUp = true;
+					this->SetState(SIMON_STATE_IDLE);
 					e->obj->SetVisible(false);
-					this->whip->PowerUp();
 				}
 			}
 			else if (dynamic_cast<Dagger_Items*>(e->obj))
@@ -116,6 +140,21 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				{
 					e->obj->SetVisible(false);
 					subWeapon = true;
+				}
+			}
+			else if (dynamic_cast<Boomerang_Items*>(e->obj))
+			{
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
+					subWeapon = true;
+				}
+			}
+			else if (dynamic_cast<MoneyPocket_Items*>(e->obj))
+			{
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
 				}
 			}
 			else if (dynamic_cast<CStartStair*> (e->obj))
@@ -185,7 +224,8 @@ void CSimon::SetState(int state)
 	case SIMON_STATE_IDLE:
 	{
 		isStanding = true;
-		vx = 0;
+		if (onMovingPlatform == true) {}
+		else vx = 0;
 		break;
 	}
 	case SIMON_STATE_WALKING:
@@ -203,6 +243,7 @@ void CSimon::SetState(int state)
 	}
 	case SIMON_STATE_JUMP:
 	{
+		if (onMovingPlatform==true) vx = 0;
 		isStanding = true;
 		vy = -SIMON_JUMP_SPEED_Y;			
 		break;
@@ -216,8 +257,18 @@ void CSimon::SetState(int state)
 	}
 	case SIMON_STATE_ATTACK:
 	{
-		animation_set->at(SIMON_ANI_ATTACK)->Reset();
-		animation_set->at(SIMON_ANI_ATTACK)->SetAniStartTime(GetTickCount());
+		if (onStairs == 0)
+		{
+			animation_set->at(SIMON_ANI_ATTACK)->Reset();
+			animation_set->at(SIMON_ANI_ATTACK)->SetAniStartTime(GetTickCount());
+
+		}
+		else
+		{
+			animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->Reset();
+			animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->SetAniStartTime(GetTickCount());
+			//break;
+		}
 		break;
 	}
 	case SIMON_STATE_SIT_ATTACK:
@@ -304,10 +355,16 @@ void CSimon::Render()
 	}
 	else
 	{
-		if (vx == 0) 
-			ani = SIMON_ANI_IDLE;
-		else	
-			ani = SIMON_ANI_WALKING;
+		if (vx == 0)
+		{
+			if (powerUp == true) ani = SIMON_ANI_POWER_UP;
+			else ani = SIMON_ANI_IDLE;
+		}	
+		else 
+		{
+			if (onMovingPlatform == true ) ani = SIMON_ANI_IDLE;
+			else ani = SIMON_ANI_WALKING;
+		}
 	}
 	
 	int alpha = 255;
@@ -456,7 +513,7 @@ void CSimon::GoDownStair()
 		// Enable go down stair
 		float xS, yS;
 		stairs->GetPosition(xS, yS);
-		nx = stairs->GetOrientation();
+		nx =- stairs->GetOrientation();
 		this->vx = nx * SIMON_GO_UPSTAIR_SPEED;
 		this->vy = SIMON_GO_UPSTAIR_SPEED;
 		onStairs = -1;
@@ -471,16 +528,4 @@ void CSimon::GoDownStair()
 		this->vx = nx * SIMON_GO_UPSTAIR_SPEED;
 		this->vy = SIMON_GO_UPSTAIR_SPEED;
 	}
-}
-
-void CSimon::StartAutoMove(float vx, float xDestination)
-{
-	if (!autoMove)
-	{
-		autoMoveInfo.xDes = xDestination;
-		autoMoveInfo.vx = vx;
-
-		autoMove = true;
-	}
-	// Proceed Auto Move
 }

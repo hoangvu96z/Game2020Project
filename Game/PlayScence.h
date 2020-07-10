@@ -21,9 +21,10 @@
 #include "Dagger.h"
 #include "StartStair.h"
 #include "EndStair.h"
+#include "MovingPlatform.h"
 #include<vector>
 
-#define SCREEN_WIDTH	 250
+#define SCREEN_WIDTH	 270
 #define SCREEN_HEIGHT 230
 
 #define TILE_WIDTH	32
@@ -35,6 +36,7 @@ protected:
 	CSimon* player;
 	CWhip* whip;
 	CDagger* dagger;
+	Boomerang_Items* boomerang;
 	vector<LPGAMEOBJECT> objects;
 	int mapWidth, offset_y;
 	vector<LPTILE> tiledMap;
@@ -54,6 +56,7 @@ public:
 
 	CSimon* GetPlayer() { return player; }
 	CDagger* GetDagger() { return dagger; }
+	Boomerang_Items* GetBoomerang() { return boomerang; }
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler

@@ -1,20 +1,52 @@
 #include "Boomerang_Items.h"
-#include "Brick.h"
+#include "Simon.h"
 
-Boomerang_Items::Boomerang_Items()
+Boomerang_Items::Boomerang_Items(): CGameObject()
 {
-	this->visible = false;
+	vx = 0.12f;
 }
 
 void Boomerang_Items::Render()
 {
-	animation_set->at(0)->Render(x, y, -1);
+	animation_set->at(0)->Render(x, y, nx);
 }
 
-void Boomerang_Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void Boomerang_Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
+	left = x;
+	top = y;
+	right = x + BOOMERANG_BBOX_WIDTH;
+	bottom = y + BOOMERANG_BBOX_HEIGHT;
+}
+
+void Boomerang_Items::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
+{
+
+	// Boomerang moving logic
+	vx = 0.12f*nx;
+
+	float xS, yS;
+	CSimon::GetInstance()->GetPosition(xS, yS);
+	float xBm, yBm;
+	this->GetPosition(xBm, yBm);
+	if (xBm - xS > 150)
+	{
+		if (turnoverDelayTime < 150)
+		{
+			vx = 0;
+			turnoverDelayTime += dt;
+
+		}
+		else
+		{
+			nx = -nx;
+			vx = -vx;
+			turnoverDelayTime = 0;
+		}
+	}
+
+
 	CGameObject::Update(dt);
-	vy += ITEM_GRAVITY * dt;				// simple fall down
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -22,10 +54,10 @@ void Boomerang_Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEvents.clear();
 	CalcPotentialCollisions(coObjects, coEvents);
 
-	if (coEvents.size() == 0)
+	if (coEvents.size()==0)
 	{
-		y += dy;
 		x += dx;
+		y += dy;
 	}
 	else
 	{
@@ -35,31 +67,9 @@ void Boomerang_Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		x += min_tx * dx;
 		y += min_ty * dy;
-
-		for (UINT i = 0; i < coEventsResult.size(); ++i)
-		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-
-			if (dynamic_cast<CBrick*>(e->obj))
-			{
-				// Block brick
-				if (e->ny != 0)
-				{
-					y += 0.4f * e->ny;
-					vy = 0;
-				}
-			}
-		}
 	}
 
 	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-}
+	for (int i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
-void Boomerang_Items::GetBoundingBox(float& left, float& top, float& right, float& bottom)
-{
-	left = x;
-	top = y;
-	right = x + ITEM_BOOMERANG_BBOX_WIDTH;
-	bottom = y + ITEM_BOOMERANG_BBOX_HEIGHT;
 }

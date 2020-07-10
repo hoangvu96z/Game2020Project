@@ -81,9 +81,6 @@
     <ClCompile Include="DrawCharacters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Boomerang.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Bat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,6 +94,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MoneyPocket_Items.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MovingPlatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Subweapons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -167,9 +170,6 @@
     <ClInclude Include="DrawCharacters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Boomerang.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Bat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -183,6 +183,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MoneyPocket_Items.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovingPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Subweapons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

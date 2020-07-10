@@ -30,6 +30,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_ITEM_MONEY_BAG	10
 #define OBJECT_TYPE_ITEM_DAGGER			6
 #define OBJECT_TYPE_ITEM_BOOMERANG 61
+#define OBJECT_TYPE_BOOMERANG			71
 #define OBJECT_TYPE_DAGGER					7
 #define OBJECT_TYPE_BLACK_KNIGHT		8
 #define OBJECT_TYPE_PORTAL	50
@@ -38,6 +39,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_STAIR_TOP			-3
 #define SCENE_SECTION_MAP_INFO				7
 #define SCENE_SECTION_TILE_MAP				8
+#define OBJECT_TYPE_MOVING_PLATFORM	30
 
 
 #define MAX_SCENE_LINE 1024
@@ -85,7 +87,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		obj = new CDagger();
 		dagger = (CDagger*)obj;
-		obj->visible = false;
+		obj->SetVisible(false);
 		break;
 	}
 	case OBJECT_TYPE_BLACK_KNIGHT: obj = new CBlack_Knight(); break;
@@ -99,35 +101,42 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj->SetItemId(it);		
 		break;
 	}
+	case OBJECT_TYPE_MOVING_PLATFORM: obj = new CMovingPlatform(); break;
 	case OBJECT_TYPE_ITEM_BIG_HEART: 
 	{
 		obj = new BHeart_Items();
-		CItems::GetInstance()->AddItem((int)CGameObject::ItemType::BIG_HEART, obj);
+		//CItems::GetInstance()->AddItem((int)CGameObject::ItemType::BIG_HEART, obj);
+		break;
+	}
+	case OBJECT_TYPE_BOOMERANG:
+	{
+		obj = new Boomerang_Items();
+		boomerang = (Boomerang_Items*)obj;
+		obj->SetVisible(false);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_CHAIN:
 	{
 		 obj = new Chain_Items();
-		 CItems::GetInstance()->AddItem((int)CGameObject::ItemType::CHAIN, obj);
+		// CItems::GetInstance()->AddItem((int)CGameObject::ItemType::CHAIN, obj);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_DAGGER:
 	{
 		obj = new Dagger_Items();
-		CItems::GetInstance()->AddItem((int)CGameObject::ItemType::DAGGER, obj);
+		CItems::GetInstance()->AddItem((int)ItemType::DAGGER, obj);
 		break;
 	}
-
 	case OBJECT_TYPE_ITEM_MONEY_BAG:
 	{
 		obj = new MoneyPocket_Items();
-		CItems::GetInstance()->AddItem((int)CGameObject::ItemType::MONEY_POCKET, obj);
+		CItems::GetInstance()->AddItem((int)ItemType::MONEY_BAG, obj);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_BOOMERANG:
 	{
 		obj = new Boomerang_Items();
-		CItems::GetInstance()->AddItem((int)CGameObject::ItemType::BOOMERANG, obj);
+		CItems::GetInstance()->AddItem((int)ItemType::BOOMERANG, obj);
 		break;
 	}
 	case OBJECT_TYPE_STAIR_BOTTOM:
@@ -248,25 +257,14 @@ void CPlayScene::Update(DWORD dt)
 	float cx, cy;
 	player->GetPosition(cx, cy);	
 	
-	if(CGame::GetInstance()->GetSceneId() == 3)
+	if (cx > mapWidth - SCREEN_WIDTH / 2)
 	{
-		CGame* game = CGame::GetInstance();
-		cx -= game->GetScreenWidth() / 2;
-		cy -= game->GetScreenHeight() / 2;
-
-		CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
+		return;
 	}
-	else
-	{
-		if (cx > mapWidth - SCREEN_WIDTH / 2)
-		{
-			return;
-		}
-		CGame* game = CGame::GetInstance();
-		cx -= game->GetScreenWidth() / 2;
-		cy -= game->GetScreenHeight() / 2;
-		CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
-	}
+	CGame* game = CGame::GetInstance();
+	cx -= game->GetScreenWidth() / 2;
+	cy -= game->GetScreenHeight() / 2;
+	game ->SetCamPos(cx, 0.0f /*cy*/);
 }
 
 
@@ -342,17 +340,17 @@ void CPlayScene::Unload()
 
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
-	DebugOut(L"KeyDown: %d\n", KeyCode);
-
 	CSimon *simon = ((CPlayScene*)scence)->GetPlayer();
 	CDagger *dagger = ((CPlayScene*)scence)->GetDagger();
+	Boomerang_Items *boomerang = ((CPlayScene*)scence)->GetBoomerang();
 	switch (KeyCode)
 	{	
 	case DIK_SPACE:
 	{
 		if (simon->GetState() == SIMON_STATE_JUMP ||
 			simon->GetState() == SIMON_STATE_ATTACK || 
-			simon->GetState() == SIMON_STATE_SIT_ATTACK)
+			simon->GetState() == SIMON_STATE_SIT_ATTACK ||
+			simon->onStairs !=0)
 			return;
 
 		simon->SetState(SIMON_STATE_JUMP);
@@ -391,6 +389,19 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_Q: // Upgrade whip
 	{
 		simon->whip->PowerUp();
+		break;
+	}
+	case DIK_D:
+	{
+		if (simon->subWeapon == false)
+			return;
+		if (simon->GetState() == SIMON_STATE_THROW && boomerang->visible == true) return;
+		float xS, yS;
+		simon->GetPosition(xS, yS);
+		boomerang->SetPosition(xS, yS);
+		boomerang->SetOrientation(simon->nx);
+		boomerang->SetVisible(true);
+		simon->SetState(SIMON_STATE_THROW);
 		break;
 	}
 
@@ -444,7 +455,10 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 	if (simon->GetState() == SIMON_STATE_THROW &&
 		simon->animation_set->at(SIMON_ANI_THROW)->IsOver(SIMON_ATTACK_TIME) == false)
 		return;
-	
+	if (simon->GetState() == SIMON_STATE_ATTACK &&
+		simon->animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->IsOver(SIMON_ATTACK_TIME) == false)
+		return;
+	if (simon->powerUp == true) return;
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
 		if (simon->onStairs == 0)
@@ -475,12 +489,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	else if (game->IsKeyDown(DIK_DOWN))
 	{
-		if (simon->onStairs != 0)
-		{
-			simon->SetState(SIMON_STATE_GO_DOWNSTAIR);
-		}
-		else  simon->SetState(SIMON_STATE_SIT);
-		
+		simon->SetState(SIMON_STATE_GO_DOWNSTAIR);
 	}		
 	else if (game->IsKeyDown(DIK_UP))
 		simon->SetState(SIMON_STATE_GO_UPSTAIR);

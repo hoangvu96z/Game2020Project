@@ -43,6 +43,7 @@
 #define SIMON_ANI_IDLE_UPSTAIR		11
 #define SIMON_ANI_IDLE_DOWNSTAIR	12
 #define SIMON_ANI_THROW					13
+#define SIMON_ANI_POWER_UP			14
 
 #define SIMON_GRAVITY						0.0004f	
 #define SIMON_WALKING_SPEED			0.06f
@@ -51,6 +52,7 @@
 #define SIMON_DIE_DEFLECT_SPEED		0.5
 #define SIMON_ATTACK_TIME				300
 #define SIMON_AUTO_STAIR_TIME			300
+#define SIMON_DISCOLOR_TIME			700
 
 #define SIMON_BBOX_WIDTH			15
 #define SIMON_BBOX_HEIGHT			30
@@ -76,8 +78,11 @@ public:
 
 	bool enemiesActived = false;
 	bool subWeapon = false;
-	bool isStanding;
 	bool autoMove;
+	bool isStanding = false;
+	bool powerUp = false;
+	bool onMovingPlatform = false;
+	DWORD discolorationTime = 0;
 	AutoMoveInfo autoMoveInfo;
 
 	CSimon(float x=0.0f, float y =0.0f);
@@ -96,6 +101,5 @@ public:
 	void GoDownStair();
 	void ProceedOnStairs();
 	vector<LPGAMEOBJECT> ovObjects;		// overlapping objects
-	void StartAutoMove(float vx, float xDestination);
-	bool ActiveEnemies() { return enemiesActived; }
+
 };
