@@ -75,16 +75,16 @@
     <ClCompile Include="Dagger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BlackKnight_Enemy.cpp">
+    <ClCompile Include="BlackKnight_Enemies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrawCharacters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Boomerang.cpp">
+    <ClCompile Include="Boomerang_Weapons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bat.cpp">
+    <ClCompile Include="Bat_Enemies.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StartStair.cpp">
@@ -97,6 +97,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MoneyPocket_Items.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MovingPlatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Subweapons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VariousStair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WallPieces.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BreakWall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,16 +179,16 @@
     <ClInclude Include="Dagger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BlackKnight_Enemy.h">
+    <ClInclude Include="BlackKnight_Enemies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DrawCharacters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Boomerang.h">
+    <ClInclude Include="Boomerang_Weapons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bat.h">
+    <ClInclude Include="Bat_Enemies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EndStair.h">
@@ -183,6 +201,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MoneyPocket_Items.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MovingPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreBoard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VariousStair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WallPieces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BreakWall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

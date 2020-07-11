@@ -10,12 +10,11 @@
 #define CANDLE_BIG_BBOX_HEIGHT	32
 
 #define CANDLE_SMALL_BBOX_WIDTH	8
+#define CANDLE_SMALL_BBOX_HEIGHT	16
 
 #define CANDLE_DESTROYED_EFFECT_TIME 300
-#define CANDLE_SMALL_BBOX_HEIGHT	16
 class CCandle : public CGameObject
 {
-
 public:
 	CCandle();	
 	virtual void Render();

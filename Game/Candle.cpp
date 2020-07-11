@@ -7,7 +7,6 @@ void CCandle::Render()
 	animation_set->at(state)->Render(x, y, -1);
 }
 
-// Update Candle
 void CCandle::Update(DWORD dt, vector<LPGAMEOBJECT>* coObject)
 {
 	if (state== CANDLE_DESTROYED 
@@ -38,5 +37,9 @@ void CCandle::GetBoundingBox(float& left, float& top, float& right, float& botto
 			bottom = y + CANDLE_SMALL_BBOX_HEIGHT;
 			break;
 		}
-	}
+		case CANDLE_DESTROYED:
+		{
+			break;
+		}
+	}	
 }

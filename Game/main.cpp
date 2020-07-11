@@ -11,9 +11,7 @@
 #define WINDOW_CLASS_NAME L"SampleWindow"
 #define MAIN_WINDOW_TITLE L"CASTE VANIA"
 
-#define BACKGROUND_COLOR D3DCOLOR_XRGB(0, 0,0)
-#define SCREEN_WIDTH 250
-#define SCREEN_HEIGHT 230
+#define BACKGROUND_COLOR D3DCOLOR_XRGB(5, 5, 5)
 
 #define MAX_FRAME_RATE 90
 
@@ -42,7 +40,7 @@ void Update(DWORD dt)
 }
 
 /*
-	Render a frame
+	Render a frame 
 */
 void Render()
 {
@@ -101,7 +99,7 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int ScreenWidth, int Sc
 			hInstance,
 			NULL);
 
-	if (!hWnd)
+	if (!hWnd) 
 	{
 		OutputDebugString(L"[ERROR] CreateWindow failed");
 		DWORD ErrCode = GetLastError();
@@ -142,12 +140,12 @@ int Run()
 			frameStart = now;
 
 			game->ProcessKeyboard();
-
+			
 			Update(dt);
 			Render();
 		}
 		else
-			Sleep(tickPerFrame - dt);
+			Sleep(tickPerFrame - dt);	
 	}
 
 	return 1;
@@ -163,8 +161,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	game->LoadResources();
 	game->LoadGameFile(L"Castlevania.txt");
-
-
+	
+	
 	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 
 	Run();

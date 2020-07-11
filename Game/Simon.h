@@ -9,6 +9,9 @@
 #include "Dagger.h"
 #include "StartStair.h"
 #include "EndStair.h"
+#include "VariousStair.h"
+#include "BreakWall.h"
+#include "Bat_Enemies.h"
 
 #define SIMON_STATE_IDLE								0
 #define SIMON_STATE_WALKING						1
@@ -43,15 +46,21 @@
 #define SIMON_ANI_IDLE_UPSTAIR		11
 #define SIMON_ANI_IDLE_DOWNSTAIR	12
 #define SIMON_ANI_THROW					13
+#define SIMON_ANI_POWER_UP			14
 
-#define SIMON_GRAVITY						0.0004f	
-#define SIMON_WALKING_SPEED			0.06f
+#define SIMON_GRAVITY						0.0005f	
+#define SIMON_WALKING_SPEED			0.09f
 #define SIMON_JUMP_SPEED_Y				0.18f
 #define SIMON_GO_UPSTAIR_SPEED		0.03f
 #define SIMON_DIE_DEFLECT_SPEED		0.5
 #define SIMON_ATTACK_TIME				300
 #define SIMON_AUTO_STAIR_TIME			300
+#define SIMON_DISCOLOR_TIME			700
 
+#define SIMON_DEFLECT_TIME				800
+#define SIMON_DEFLECT_SPEED_X			0.06f
+#define SIMON_DEFLECT_SPEED_Y			0.14f
+#define SIMON_UNTOUCHABLE_TIME	3000
 #define SIMON_BBOX_WIDTH			15
 #define SIMON_BBOX_HEIGHT			30
 
@@ -68,22 +77,25 @@ class CSimon : public CGameObject
 	static CSimon* __instance; // Singleton Patern
 	float start_x, start_y; // Initial position of simon at scene instead of (0,0)
 
+	int untouchable;
+	DWORD untouchable_start;
 public:
 	int onStairs;
-	LPWHIP whip;	
-	//LPWHIP nextSceneWhip;
+	CWhip* whip;
 	CDagger* dagger;
 
-	bool enemiesActived = false;
 	bool subWeapon = false;
-	bool isStanding;
-	bool autoMove;
+	bool isStanding = false;
+	bool powerUp = false;
+	bool onMovingPlatform = false;
+	DWORD discolorationTime = 0;
 	AutoMoveInfo autoMoveInfo;
 
 	CSimon(float x=0.0f, float y =0.0f);
 	
 	virtual void Update(DWORD dt, vector <LPGAMEOBJECT>* coObject = NULL);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 
 	void Render();
 	void SetState(int state);	
@@ -96,6 +108,4 @@ public:
 	void GoDownStair();
 	void ProceedOnStairs();
 	vector<LPGAMEOBJECT> ovObjects;		// overlapping objects
-	void StartAutoMove(float vx, float xDestination);
-	bool ActiveEnemies() { return enemiesActived; }
 };

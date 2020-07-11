@@ -12,19 +12,24 @@
 #include "BHeart_Items.h"
 #include "Boomerang_Items.h"
 #include "MoneyPocket_Items.h"
-#include "Bat.h"
+#include "Bat_Enemies.h"
 #include "Chain_Items.h"
-#include "HUD.h"
 #include "Portal.h"
-#include "BlackKnight_Enemy.h"
+#include "BlackKnight_Enemies.h"
 #include "Dagger_Items.h"
 #include "Dagger.h"
 #include "StartStair.h"
 #include "EndStair.h"
+#include "VariousStair.h"
+#include "MovingPlatform.h"
+#include "Boomerang_Weapons.h"
+#include "BreakWall.h"
+#include "WallPieces.h"
+#include "ScoreBoard.h"
 #include<vector>
 
-#define SCREEN_WIDTH	 250
-#define SCREEN_HEIGHT 230
+#define SCREEN_WIDTH	 270
+#define SCREEN_HEIGHT 270
 
 #define TILE_WIDTH	32
 #define TILE_HEIGHT	32
@@ -38,7 +43,8 @@ protected:
 	vector<LPGAMEOBJECT> objects;
 	int mapWidth, offset_y;
 	vector<LPTILE> tiledMap;
-	HUD* HUD;
+	ScoreBoard* HUD;
+	Boomerang_Weapons* boomerang;
 
 	void _ParseSection_MAP_INFO(string line);
 	void _ParseSection_OBJECTS(string line);
@@ -50,17 +56,17 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-	friend class CPlayScenceKeyHandler;
 
 	CSimon* GetPlayer() { return player; }
 	CDagger* GetDagger() { return dagger; }
+	Boomerang_Weapons* GetBoomerang() { return boomerang; }
 };
 
 class CPlayScenceKeyHandler : public CScenceKeyHandler
 {	
-	public: 	
-		void KeyState(BYTE *states);
-		void OnKeyDown(int KeyCode);
-		void OnKeyUp(int KeyCode);
-		CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
+public: 	
+	void KeyState(BYTE *states);
+	void OnKeyDown(int KeyCode);
+	void OnKeyUp(int KeyCode);
+	CPlayScenceKeyHandler(CScene *s) :CScenceKeyHandler(s) {};
 };

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define ID_TEX_BBOX		-100		
+#define ID_TEX_BBOX		-100	
 #define ITEM_GRAVITY	0.0018f
 
 class CGameObject; 
@@ -21,8 +21,8 @@ struct CCollisionEvent
 {
 	LPGAMEOBJECT obj;
 	float t, nx, ny;
-	float dx, dy;		
-
+	float dx, dy;
+	
 	CCollisionEvent(float t, float nx, float ny, float dx = 0, float dy = 0, LPGAMEOBJECT obj = NULL) 
 	{ 
 		this->t = t; 
@@ -39,6 +39,22 @@ struct CCollisionEvent
 	}
 };
 
+enum class ItemType
+{
+	UNKNOWN = -1,
+	BIG_HEART = 4,
+	CHAIN = 5,
+	DAGGER = 6,
+	BOOMERANG = 61,
+	MONEY_BAG = 10
+};
+
+enum class SubWeapon
+{
+	UNKNOWN =-1,
+	DAGGER =7,
+	BOOMERANG = 71
+};
 
 class CGameObject
 {
@@ -59,16 +75,6 @@ public:
 	int state;
 	bool visible;
 	int itemId;
-
-	enum class ItemType
-	{
-		UNKNOWN = -1,
-		BIG_HEART =	4,
-		CHAIN =	5,
-		DAGGER = 6,
-		BOOMERANG = 61,
-		MONEY_POCKET = 10
-	}; 
 
 	DWORD dt; 
 
@@ -91,6 +97,7 @@ public:
 	// Orientation
 	void SetOrientation(int nx) { this->nx = nx; }
 	int GetOrientation() { return nx; }	
+	void ReDirection() { this->nx= -nx; this->vx = -vx; }
 	// Visibility
 	void SetVisible(bool visible) { this->visible = visible; }
 	bool isVisible() { return this->visible; }	

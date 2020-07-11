@@ -28,6 +28,11 @@ void CItems::Drop(int iType, float x, float y)
 	}
 }
 
+void CItems::Clear()
+{
+	items.clear();
+}
+
 CItems* CItems::GetInstance()
 {
 	if (__instance == NULL)
