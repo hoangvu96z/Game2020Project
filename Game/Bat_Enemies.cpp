@@ -1,4 +1,5 @@
 #include "Bat_Enemies.h"
+#include "BlackKnight_Enemies.h"
 #include "Simon.h"
 Bat_Enemies::Bat_Enemies(float x, float y) : CGameObject()
 {
@@ -79,6 +80,18 @@ void Bat_Enemies::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		x += min_tx * dx;
 		y += min_ty * dy;
+
+		for (UINT i = 0; i < coEventsResult.size(); i++)
+		{
+			LPCOLLISIONEVENT  e = coEventsResult[i];
+
+			if (dynamic_cast<CBlack_Knight*>(e->obj))
+			{
+				// Process normally	
+				if (e->nx != 0) x += dx;
+				if (e->ny != 0) y += dy;
+			}
+		}
 
 	}
 

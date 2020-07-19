@@ -7,6 +7,8 @@
 #include "GameObject.h"
 #include "Sprites.h"
 
+#define  UNTOUCHABLE_TIME	200
+
 CGameObject::CGameObject()
 {
 	state = 0;
@@ -14,6 +16,9 @@ CGameObject::CGameObject()
 	vx = vy = 0;
 	nx = 1;	
 	visible = true;
+	healthPoint = 0;
+	damage = 0;
+	score = 0;
 }
 
 void CGameObject::Update(DWORD dt, vector<LPGAMEOBJECT>* objects)
@@ -156,4 +161,34 @@ void CGameObject::ResetAnimation()
 {
 	for (auto iter : animations)
 		iter->Reset();
+}
+
+void CGameObject::Untouchable()
+{
+	if (GetTickCount() - start_untouchable > UNTOUCHABLE_TIME)
+		start_untouchable = 0;
+	else 
+		vx = vy = 0;
+}
+
+void CGameObject::TakeDamage(int damage)
+{
+	if (start_untouchable == 0)
+	{
+		if (healthPoint > 0)
+			healthPoint -= damage;
+
+		if (healthPoint <= 0)
+		{
+			this->Die();
+		}
+
+		else
+			start_untouchable = GetTickCount();
+	}
+}
+
+void CGameObject::Die()
+{	
+	this->SetVisible(false);
 }

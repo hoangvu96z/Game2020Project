@@ -14,10 +14,15 @@
 #define OFFSET_LEFT_SHORT_CHAIN			25
 #define OFFSET_RIGHT_CHAIN					70
 
+#define HIT_EFFECT_LIFE_SPAN	100
+
 class CWhip : public CGameObject
 {
 	int level;
 	static CWhip* __instance;
+	vector<vector<float>> hitEffects;
+	int startShow = 0;
+	CAnimation* hitEffect = CAnimations::GetInstance()->Get(HIT_EFFECT_ANIMATION);
 public:
 	CWhip();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
@@ -27,9 +32,10 @@ public:
 	virtual void SetState(int state);
 	int GetLevel() { return level; }
 	void SetLevel(int level) { this->level = level; }
-	bool isColliding(float obj_left, float obj_top, float obj_right, float obj_bottom);
 	void SetWhipPosition(D3DXVECTOR2 simonPos, bool isStanding);
 	void PowerUp();
 	static CWhip* GetInstance();
+	void ShowHitEffect();
+	void SetDamage(int state);
 };
 typedef CWhip* LPWHIP;

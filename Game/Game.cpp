@@ -185,6 +185,14 @@ void CGame::InitKeyboard()
 	DebugOut(L"[INFO] Keyboard has been initialized successfully\n");
 }
 
+void CGame::GetCameraBoundingBox(float& left, float& top, float& right, float& bottom)
+{
+	left = this->cam_x;
+	top = this->cam_y;
+	right = left + GetScreenWidth();
+	bottom = top + GetScreenHeight();
+}
+
 void CGame::ProcessKeyboard()
 {
 	HRESULT hr; 

@@ -1,9 +1,12 @@
 #include "Boomerang_Weapons.h"
 #include "Simon.h"
 
+#define BOOMERANG_VX	0.12f
+#define BOOMERANG_MAX_DISTANCE	150
+
 Boomerang_Weapons::Boomerang_Weapons(): CGameObject()
 {
-	vx = 0.12f;
+	vx = BOOMERANG_VX;
 }
 
 void Boomerang_Weapons::Render()
@@ -22,30 +25,34 @@ void Boomerang_Weapons::GetBoundingBox(float& left, float& top, float& right, fl
 void Boomerang_Weapons::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 {
 
-	// Boomerang moving logic
-	vx = 0.12f*nx;
+	float left, top, right, bottom;
+	CGame::GetInstance()->GetCameraBoundingBox(left, top, right, bottom);
 
 	float xS, yS;
 	CSimon::GetInstance()->GetPosition(xS, yS);
-	float xBm, yBm;
-	this->GetPosition(xBm, yBm);
-	if (xBm - xS > 150)
+
+	if (!turnOver)
 	{
-		if (turnoverDelayTime < 150)
+		if (x > (right - BOOMERANG_BBOX_WIDTH) || x <= left)
 		{
-			vx = 0;
-			turnoverDelayTime += dt;
-			
+			this->nx = -nx;
+			turnOver = true;
 		}
-		else
+		else if (abs(x - xS) > BOOMERANG_MAX_DISTANCE)
 		{
-			nx = -nx;
-			vx = -vx;
-			turnoverDelayTime = 0;
+			this->nx = -nx;
+			turnOver = true;
 		}
 	}
-
-
+	else
+	{
+		if ((x > right) || (x <= left)) 
+		{
+			SetVisible(false);
+			turnOver = false;
+		}
+	}
+	vx = BOOMERANG_VX * nx;
 	CGameObject::Update(dt);
 
 	vector<LPCOLLISIONEVENT> coEvents;
@@ -71,5 +78,5 @@ void Boomerang_Weapons::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 
 	// clean up collision events
 	for (int i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
+	
 }

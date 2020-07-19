@@ -117,6 +117,9 @@
     <ClCompile Include="BreakWall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SHeart_Items.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Brick.h">
@@ -216,6 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BreakWall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SHeart_Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

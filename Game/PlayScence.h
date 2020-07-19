@@ -26,6 +26,7 @@
 #include "BreakWall.h"
 #include "WallPieces.h"
 #include "ScoreBoard.h"
+#include "SHeart_Items.h"
 #include<vector>
 
 #define SCREEN_WIDTH	 270

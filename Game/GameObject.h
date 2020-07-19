@@ -45,6 +45,7 @@ enum class ItemType
 	BIG_HEART = 4,
 	CHAIN = 5,
 	DAGGER = 6,
+	SMALL_HEART = 44,
 	BOOMERANG = 61,
 	MONEY_BAG = 10
 };
@@ -76,6 +77,11 @@ public:
 	bool visible;
 	int itemId;
 
+	int score = 0;
+	int healthPoint = 0;
+	int damage = 0;
+
+	DWORD start_untouchable = 0;
 	DWORD dt; 
 
 	CAnimationSet animations;
@@ -133,4 +139,7 @@ public:
 	virtual bool IsOverlapping(LPGAMEOBJECT obj);
 	void ReDirect(float positionX);
 	void RenderBoundingBox();
+	void Untouchable();
+	void TakeDamage(int damage);
+	void Die();
 };

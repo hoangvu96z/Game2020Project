@@ -143,6 +143,7 @@
     <ClCompile Include="MovingPlatform.cpp" />
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="ScoreBoard.cpp" />
+    <ClCompile Include="SHeart_Items.cpp" />
     <ClCompile Include="Simon.cpp" />
     <ClCompile Include="StartStair.cpp" />
     <ClCompile Include="Subweapons.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="MovingPlatform.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="ScoreBoard.h" />
+    <ClInclude Include="SHeart_Items.h" />
     <ClInclude Include="Simon.h" />
     <ClInclude Include="StartStair.h" />
     <ClInclude Include="TileMap.h" />

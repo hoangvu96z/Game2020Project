@@ -7,8 +7,10 @@
 class Boomerang_Weapons: public CGameObject
 {
 	DWORD turnoverDelayTime=0;
+	bool turnOver = false;
 public:
-	Boomerang_Weapons();
+	CBoomerang();
+	void SetTurnOver(bool turnOver) { this->turnOver = turnOver; }
 	virtual void Render();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);

@@ -92,7 +92,7 @@ public:
 
 	void SetCamPos(float x, float y);
 	void GetCamPos(float& x, float& y);
-
+	void GetCameraBoundingBox(float& left, float& top, float& right, float& bottom);
 	static CGame * GetInstance();
 
 	~CGame();

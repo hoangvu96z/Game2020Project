@@ -27,9 +27,10 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 #define OBJECT_TYPE_BRICK						1
 #define OBJECT_TYPE_CANDLE					2
 #define OBJECT_TYPE_WHIP						3
-#define OBJECT_TYPE_ITEM_BIG_HEART		4
-#define OBJECT_TYPE_ITEM_CHAIN			5
-#define OBJECT_TYPE_ITEM_MONEY_BAG	10
+#define OBJECT_TYPE_ITEM_BIG_HEART			4
+#define OBJECT_TYPE_ITEM_SMALL_HEART	44
+#define OBJECT_TYPE_ITEM_CHAIN				5
+#define OBJECT_TYPE_ITEM_MONEY_BAG		10
 #define OBJECT_TYPE_ITEM_DAGGER			6
 #define OBJECT_TYPE_ITEM_BOOMERANG 61
 #define OBJECT_TYPE_DAGGER					7
@@ -61,6 +62,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	int ani_set_id = atoi(tokens[3].c_str());
 	CAnimationSets * animation_sets = CAnimationSets::GetInstance();
 
+	CItems* items = CItems::GetInstance();
 	CGameObject *obj = NULL;
 
 	switch (object_type)
@@ -101,6 +103,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj->SetVisible(false);
 		break;
 	}
+	case OBJECT_TYPE_ITEM_SMALL_HEART:
+	{
+		obj = new SmallHeart_Items ();
+		items->AddItem((int)ItemType::SMALL_HEART, obj);
+		break;
+	}
 	case OBJECT_TYPE_MOVING_PLATFORM: obj = new CMovingPlatform(); break;
 	case OBJECT_TYPE_BREAK_WALL: obj = new CBreakWall(x,y); break;
 	case OBJECT_TYPE_WALL_PIECES: 
@@ -131,13 +139,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_ITEM_BIG_HEART: 
 	{
 		obj = new BHeart_Items();
-		CItems::GetInstance()->AddItem((int)ItemType::BIG_HEART, obj);
+		items->AddItem((int)ItemType::BIG_HEART, obj);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_CHAIN:
 	{
 		 obj = new Chain_Items();
-		 CItems::GetInstance()->AddItem((int)ItemType::CHAIN, obj);
+		 items->AddItem((int)ItemType::DAGGER, obj);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_DAGGER:
@@ -150,13 +158,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_ITEM_MONEY_BAG:
 	{
 		obj = new MoneyPocket_Items();
-		CItems::GetInstance()->AddItem((int)ItemType::MONEY_BAG, obj);
+		items->AddItem((int)ItemType::MONEY_BAG, obj);
 		break;
 	}
 	case OBJECT_TYPE_ITEM_BOOMERANG:
 	{
 		obj = new Boomerang_Items();
-		CItems::GetInstance()->AddItem((int)ItemType::BOOMERANG, obj);
+		items->AddItem((int)ItemType::BOOMERANG, obj);
 		break;
 	}
 	case OBJECT_TYPE_VARIOUS_STAIR:

@@ -6,6 +6,7 @@
 
 class Boomerang_Items:public CGameObject
 {
+	DWORD start_visible = 0;
 public:
 	Boomerang_Items();
 	void Render();

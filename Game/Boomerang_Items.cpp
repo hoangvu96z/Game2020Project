@@ -1,5 +1,6 @@
 #include "Boomerang_Items.h"
 #include "Brick.h"
+#include "Simon.h"
 
 Boomerang_Items::Boomerang_Items()
 {
@@ -14,6 +15,19 @@ void Boomerang_Items::Render()
 void Boomerang_Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
+	if (visible)
+	{
+
+		if (start_visible < ITEM_LIFESPAN)
+		{
+			start_visible += dt;
+		}
+		else
+		{
+			SetVisible(false);
+			start_visible = 0;
+		}
+	}
 	vy += ITEM_GRAVITY * dt;				// simple fall down
 
 	vector<LPCOLLISIONEVENT> coEvents;
@@ -48,6 +62,11 @@ void Boomerang_Items::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					y += 0.4f * e->ny;
 					vy = 0;
 				}
+			}
+			else if (dynamic_cast<CSimon*>(e->obj))
+			{
+				if (e->nx != 0) x += dx;
+				if (e->ny != 0) y += dy;
 			}
 		}
 	}

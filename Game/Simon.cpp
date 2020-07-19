@@ -16,7 +16,6 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 {
 	// Calculate x,y
 	CGameObject::Update(dt);
-	whip->Update(dt, coObjects);
 	dagger->Update(dt, coObjects);
 
 	// Simple fall down
@@ -114,6 +113,15 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				}
 					
 			}
+			else if (dynamic_cast<Boomerang_Weapons*>(e->obj))
+			{
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
+					Boomerang_Weapons* bm = dynamic_cast<Boomerang_Weapons*> (e->obj);
+					bm->SetTurnOver(false);
+				}
+			}
 			else if (dynamic_cast<CMovingPlatform*>(e->obj))
 			{			
 				if (e->nx != 0) x += dx;
@@ -127,6 +135,14 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				DebugOut(L"[ITEMS] Heart Collected \n");
 				if (e->nx != 0 || e->ny != 0)
 				{
+					e->obj->SetVisible(false);
+				}
+			}
+			else if (dynamic_cast<SmallHeart_Items*>(e->obj))
+			{
+				if (e->nx != 0 || e->ny != 0)
+				{
+					y = y - 0.2f;
 					e->obj->SetVisible(false);
 				}
 			}
@@ -160,6 +176,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			{
 				if (e->nx != 0 || e->ny != 0)
 				{
+					y = y -0.4f;
 					e->obj->SetVisible(false);
 					subWeapon = true;
 				}
@@ -220,27 +237,7 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->GetCurrentFrame()==2 ||
 			animation_set->at(SIMON_ANI_ATTACK_DOWNSTAIR)->GetCurrentFrame() == 2 ) // Only check collsion at the last frame of the whip
 		{
-			for (UINT i = 0; i < coObjects->size(); i++)
-			{
-				LPGAMEOBJECT temp = coObjects->at(i);
-				if (dynamic_cast<CCandle*>(temp))
-				{
-					CCandle* candle = dynamic_cast<CCandle*> (temp);
-					if (whip->IsOverlapping(temp))
-					{
-						temp->SetState(CANDLE_DESTROYED);				
-						temp->animation_set->at(CANDLE_DESTROYED)->SetAniStartTime(GetTickCount());
-					}
-				}
-				else if (dynamic_cast<CBreakWall*>(temp))
-				{
-					CBreakWall* breakwall = dynamic_cast<CBreakWall*>(temp);
-					if (whip->IsOverlapping(temp))
-					{
-						breakwall->Destroy();						
-					}
-				}
-			}
+			whip->Update(dt, coObjects);
 		}
 	}
 	
