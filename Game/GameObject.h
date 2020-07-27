@@ -47,14 +47,8 @@ enum class ItemType
 	DAGGER = 6,
 	SMALL_HEART = 44,
 	BOOMERANG = 61,
-	MONEY_BAG = 10
-};
-
-enum class SubWeapon
-{
-	UNKNOWN =-1,
-	DAGGER =7,
-	BOOMERANG = 71
+	MONEY_BAG = 10,
+	HOLY_WATER = 82
 };
 
 class CGameObject
@@ -142,4 +136,5 @@ public:
 	void Untouchable();
 	void TakeDamage(int damage);
 	void Die();
+	bool IsInViewport();
 };

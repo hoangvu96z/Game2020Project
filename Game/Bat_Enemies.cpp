@@ -6,6 +6,7 @@ Bat_Enemies::Bat_Enemies(float x, float y) : CGameObject()
 	start_x = x;
 	start_y = y;
 	vx = vy = 0;
+	this->healthPoint = 2;
 	SetState(BAT_STATE_IDLE);
 }
 
@@ -54,10 +55,15 @@ void Bat_Enemies::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	this->GetPosition(xB, yB);
 
 	if (xS - xB <= POINT_ACTIVE_BAT_X && yS - yB <= POINT_ACTIVE_BAT_Y) // Active Point 
-		SetState(BAT_STATE_FLYING_DOWN);
-
+	{
+		vx = 0.08f;
+		vy = 0.08f;
+	}
 	if (y - start_y >= BAT_FLYING_DOWN_DY)	// Redirecting point
-		SetState(BAT_STATE_FLYING_HORIZONTAL);
+	{
+		vx = 0.1f;
+		vy = 0.0f;
+	}
 
 	CGameObject::Update(dt);
 
@@ -85,7 +91,7 @@ void Bat_Enemies::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			LPCOLLISIONEVENT  e = coEventsResult[i];
 
-			if (dynamic_cast<CBlack_Knight*>(e->obj))
+			if (dynamic_cast<BlackKnight_Enemies*>(e->obj))
 			{
 				// Process normally	
 				if (e->nx != 0) x += dx;

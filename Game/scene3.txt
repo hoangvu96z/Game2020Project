@@ -1,11 +1,13 @@
+[PLAYER]
+# type	x	y	ani_set_id
+0	370	205	0
+#0	450	80	0
+
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
-# type: 0 = Simon , 1 = Brick, 2 = Candle, 3= Flame, 4= Items_BigHeart, 5 = Items_Chain, 6 = Items_Dagger, 7 = Dagger
+# 1 = Brick, 2 = Candle, 3= Flame, 4= Items_BigHeart, 5 = Items_Chain, 6 = Items_Dagger, 7 = Dagger
 # 8 = Black Knight,
 
-# SIMON
-#0	390	205	0
-0	450	80	0
 # top wall
 1	1	122	1	32	16
 1	97	122	1	64	16
@@ -58,8 +60,11 @@
 
 #DAGGER
 7	46	105	43
+# BOOMERANG
+71	40	145	71
+
 #Black Knight
-8	321	120	5
+8	322	120	5
 8	100	75	5
 
 #STAIR top
@@ -69,9 +74,9 @@
 # type	l	t	ani_set_id	r	b	scene_id
 50	5	80	0	10	100	4
 
-#Width	#offset_y
+#Width	height	offset_y
 [MAP_INFO]
-519	40
+525	96	40
 
 [TILE_MAP]
 0	1	2	3	4	2	1	4	3	4	1	3	4	4	1	5	6

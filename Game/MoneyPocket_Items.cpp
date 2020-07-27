@@ -8,7 +8,7 @@ MoneyPocket_Items::MoneyPocket_Items()
 
 void MoneyPocket_Items::Render()
 {
-	animation_set->at(state)->Render(x, y, 1);
+	animation_set->at(state)->Render(x, y, -1);
 }
 
 void MoneyPocket_Items::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)

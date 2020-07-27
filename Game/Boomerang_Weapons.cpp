@@ -1,5 +1,6 @@
 #include "Boomerang_Weapons.h"
 #include "Simon.h"
+#include "Candle.h"
 
 #define BOOMERANG_VX	0.12f
 #define BOOMERANG_MAX_DISTANCE	150
@@ -7,10 +8,12 @@
 Boomerang_Weapons::Boomerang_Weapons(): CGameObject()
 {
 	vx = BOOMERANG_VX;
+	this->damage = 2;
 }
 
 void Boomerang_Weapons::Render()
 {
+	ShowHitEffect();
 	animation_set->at(0)->Render(x, y, nx);
 }
 
@@ -79,4 +82,24 @@ void Boomerang_Weapons::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	// clean up collision events
 	for (int i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	
+}
+void Boomerang_Weapons::ShowHitEffect()
+{
+	if (hitEffects.size() > 0)
+	{
+		if (startShow == 0)
+		{
+			startShow = GetTickCount();
+		}
+
+		else if (GetTickCount() - startShow > HIT_EFFECT_LIFE_SPAN)
+		{
+			startShow = 0;
+			hitEffects.clear();
+		}
+
+		// rendering hit effect based on the coordinate vector
+		for (auto coord : hitEffects)
+			hitEffect->Render(coord[0], coord[1], -1);
+	}
 }

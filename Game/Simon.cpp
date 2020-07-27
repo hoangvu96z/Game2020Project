@@ -171,7 +171,13 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 				if (e->nx != 0) x += dx;
 				if (e->ny != 0) y += dy;
 			}
-
+			else if (dynamic_cast<HolyWater_Items*>(e->obj))
+			{
+				if (e->nx != 0 || e->ny != 0)
+				{
+					e->obj->SetVisible(false);
+				}
+			}
 			else if (dynamic_cast<Boomerang_Items*>(e->obj))
 			{
 				if (e->nx != 0 || e->ny != 0)
@@ -194,16 +200,19 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 			CPortal* p = dynamic_cast<CPortal*> (e->obj);
 			CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
-			else if (dynamic_cast<Bat_Enemies*>(e->obj) ||	dynamic_cast<BlackKnight_Enemies*>(e->obj))
+			else if (dynamic_cast<Bat_Enemies*>(e->obj) ||	dynamic_cast<BlackKnight_Enemies*>(e->obj) || dynamic_cast<HunchBack_Enemies*>(e->obj))
 			{
-				if (e->nx != 0 && untouchable==0)
+				if ((e->nx != 0 || e->ny!=0) && untouchable==0)
 				{
 					if (onStairs == 0)
 					{
 						StartUntouchable();
-						this->nx = (e->nx != 0) ?
-							-(e->nx) :
-							-(e->obj->GetOrientation());
+						if (e->nx != 0){
+							this->nx = -(e->nx);
+						}
+						else{
+							this->nx = -(e->obj->GetOrientation());
+						}
 						SetState(SIMON_STATE_DEFLECT);
 					}
 					else
@@ -233,9 +242,9 @@ void CSimon::Update(DWORD dt, vector <LPGAMEOBJECT>* coObjects)
 	{
 		whip->SetOrientation(nx);
 		whip->SetWhipPosition(D3DXVECTOR2(x, y), isStanding);
-		if (animation_set->at(state)->GetCurrentFrame() == 2 || 
-			animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->GetCurrentFrame()==2 ||
-			animation_set->at(SIMON_ANI_ATTACK_DOWNSTAIR)->GetCurrentFrame() == 2 ) // Only check collsion at the last frame of the whip
+		if (animation_set->at(state)->GetCurrentFrame() == 2 ||
+			animation_set->at(SIMON_ANI_ATTACK_UPSTAIR)->GetCurrentFrame() == 2 ||
+			animation_set->at(SIMON_ANI_ATTACK_DOWNSTAIR)->GetCurrentFrame() == 2) // Only check collsion at the last frame of the whip
 		{
 			whip->Update(dt, coObjects);
 		}
@@ -337,6 +346,7 @@ void CSimon::SetState(int state)
 void CSimon::Reset()
 {
 	onStairs = 0;
+	onMovingPlatform = 0;
 	SetState(SIMON_STATE_IDLE);
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
