@@ -4,6 +4,7 @@
 
 CWhip::CWhip() : CGameObject()
 {
+	SetState(NORMAL_WHIP);
 }
 
 void CWhip::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -27,7 +28,7 @@ void CWhip::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				breakwall->Destroy();
 			}
 
-			else if (dynamic_cast<BlackKnight_Enemies*>(temp))
+			else if (dynamic_cast<BlackKnight_Enemies*>(temp) || dynamic_cast<Bat_Enemies*>(temp))
 			{
 				temp->TakeDamage(this->damage);
 				float l, t, r, b;
@@ -38,7 +39,7 @@ void CWhip::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 }
 
-void CWhip::SetDamage()
+void CWhip::SetDamage(int state)
 {
 	if (state == NORMAL_WHIP)
 	{

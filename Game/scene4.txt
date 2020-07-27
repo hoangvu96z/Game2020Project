@@ -1,35 +1,72 @@
+[PLAYER]
+# type	x	y	ani_set_id
+0	720	167	0
+#0	130	167	0
+
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
-# type: 0 = Simon , 1 = Brick, 2 = Candle, 3= Whip, 4= Items_BigHeart, 5 = Items_Chain, 6 = Items_Dagger, 7 = Dagger
+# 1 = Brick, 2 = Candle, 3= Whip, 4= Items_BigHeart, 5 = Items_Chain, 6 = Items_Dagger, 7 = Dagger
 # 8 = Black Knight
-
-# SIMON
-0	710	147	0
-#0	130	60	0
 
 # BRICK 
 #1	0	194	1	700	16
-1	16	100	1	16	96
-1	32	147	1	32	16
-1	65	179	1	64	16
-1	97	115	1	96	16
-1	130	194	1	580	16
-1	672	178	1	90	16
-1	416	147	1	32	16
-1	288	147	1	32	16
+1	16	120	1	16	96
+1	32	167	1	32	16
+1	65	199	1	64	16
+1	97	135	1	96	16
+1	130	214	1	580	16
+1	672	198	1	90	16
+1	416	167	1	32	16
+1	288	167	1	32	16
 
 # WHIP
 #3	0	0	3
 
+#Holy water
+#72	538	183	72
+
+#Small candle	extra1: item, extra 2: state
+2	730	167	2	10	1
+2	666	183	2	44	1
+2	602	183	2	44	1
+2	538	183	2	82	1
+2	474	183	2	10	1
+2	410	183	2	10	1
+2	346	183	2	10	1
+2	282	183	2	10	1
+2	218	183	2	10	1
+2	154	103	2	10	1
+2	90	167	2	10	1
+
+#ITEMS
+#Small heart
+44	666	183	44
+44	602	183	44
+#Holy water
+82	538	183	47
+#Money bag	extra1: state
+10	730	167	46	2
+10	474	183	46	0
+
+#Hunch back
+64	425	121	64
+
+#Skeleton
+65	30	135	65
+
 # STAIR Bottom
--2	154	82	0	166	114	-1
+-2	154	102	0	166	134	-1
+
+# DOOR
+# type	l	t	ani_set_id	r	b
+51	752	150	0	755	198
 
 # --- SCENE PORTAL ----
 # type	l	t	ani_set_id	r	b	scene_id
-50	82	20	0	96	30	5
+50	82	40	0	96	50	5
 
 [MAP_INFO]
-770	20
+780	96	40
 
 [TILE_MAP]
 0	1	2	3	4	5	6	7	1	8	9	1	10	11	9	12	1	8	13	14	11	9	15	16

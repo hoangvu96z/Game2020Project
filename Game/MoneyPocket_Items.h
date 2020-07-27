@@ -3,7 +3,7 @@
 #include "Brick.h"
 
 #define ITEM_MONEY_BAG_BBOX_WIDTH		12
-#define ITEM_MONEY_BAG_BBOX_HEIGHT	12
+#define ITEM_MONEY_BAG_BBOX_HEIGHT	14
 class MoneyPocket_Items :public CGameObject
 {
 public:

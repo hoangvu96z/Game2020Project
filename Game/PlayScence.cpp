@@ -20,29 +20,43 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 */
 
 #define SCENE_SECTION_UNKNOWN			-1
+#define SCENE_SECTION_PLAYER					0
 #define SCENE_SECTION_OBJECTS					6
 #define SCENE_SECTION_MAP_INFO				7
 #define SCENE_SECTION_TILE_MAP				8
+
 #define OBJECT_TYPE_SIMON						0
 #define OBJECT_TYPE_BRICK						1
 #define OBJECT_TYPE_CANDLE					2
-#define OBJECT_TYPE_WHIP						3
+
 #define OBJECT_TYPE_ITEM_BIG_HEART			4
 #define OBJECT_TYPE_ITEM_SMALL_HEART	44
 #define OBJECT_TYPE_ITEM_CHAIN				5
 #define OBJECT_TYPE_ITEM_MONEY_BAG		10
-#define OBJECT_TYPE_ITEM_DAGGER			6
-#define OBJECT_TYPE_ITEM_BOOMERANG 61
+
+#define OBJECT_TYPE_ITEM_DAGGER				80
+#define OBJECT_TYPE_ITEM_BOOMERANG	81
+#define OBJECT_TYPE_ITEM_HOLY_WATER		82
+
 #define OBJECT_TYPE_DAGGER					7
 #define OBJECT_TYPE_BOOMERANG			71
+#define OBJECT_TYPE_HOLY_WATER			72
+
+#define OBJECT_TYPE_ZOMBIE					63
+#define OBJECT_TYPE_HUNCH_BACK			64
+#define OBJECT_TYPE_SKELETON				65
+
 #define OBJECT_TYPE_BLACK_KNIGHT		8
 #define OBJECT_TYPE_BAT							9
+
 #define OBJECT_TYPE_VARIOUS_STAIR	-1
 #define OBJECT_TYPE_STAIR_BOTTOM	-2
 #define OBJECT_TYPE_STAIR_TOP			-3
 
 #define OBJECT_TYPE_MOVING_PLATFORM	30
+#define OBJECT_TYPE_CROWN_ITEM				40
 #define OBJECT_TYPE_PORTAL						50
+#define OBJECT_TYPE_DOOR							51
 #define OBJECT_TYPE_BREAK_WALL				90
 #define OBJECT_TYPE_WALL_PIECES				91
 
@@ -51,6 +65,34 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):	CScene(id, filePath)
 /*
 	Parse a line in section [OBJECTS] 
 */
+void CPlayScene::_ParseSection_PLAYER(string line)
+{
+	vector<string> tokens = split(line);
+	if (tokens.size() < 3) return; // skip invalid lines - an object set must have at least id, x, y
+	int object_type = atoi(tokens[0].c_str());
+	float x = atof(tokens[1].c_str());
+	float y = atof(tokens[2].c_str());
+	int ani_set_id = atoi(tokens[3].c_str());
+
+	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+	CGameObject* playerObj = NULL;
+
+	if (player != NULL)
+	{
+		DebugOut(L"[ERROR] SIMON object was created before! ");
+		return;
+	}
+
+	playerObj = CSimon::GetInstance();
+	player = (CSimon*)playerObj;
+
+	playerObj->SetPosition(x, y);
+	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
+	playerObj->SetAnimationSet(ani_set);
+	DebugOut(L"[INFO] Player object created!\n");
+}
+
+
 void CPlayScene::_ParseSection_OBJECTS(string line)
 {
 	vector<string> tokens = split(line);
@@ -67,18 +109,17 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	switch (object_type)
 	{	
-	case OBJECT_TYPE_SIMON:
-	{
-		if (player != NULL)
-		{
-			DebugOut(L"[ERROR] SIMON object was created before! ");
-			return;
-		}
-		obj = CSimon::GetInstance();
-		player = (CSimon*)obj;
-		break;
-	}
-
+	// case OBJECT_TYPE_SIMON:
+	// {
+	// 	if (player != NULL)
+	// 	{
+	// 		DebugOut(L"[ERROR] SIMON object was created before! ");
+	// 		return;
+	// 	}
+	// 	obj = CSimon::GetInstance();
+	// 	player = (CSimon*)obj;
+	// 	break;
+	// }
 	case OBJECT_TYPE_BRICK:
 	{
 		int width = atoi(tokens[4].c_str());
@@ -110,11 +151,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 	case OBJECT_TYPE_MOVING_PLATFORM: obj = new CMovingPlatform(); break;
+	case OBJECT_TYPE_CROWN_ITEM: obj = new Crown_Items(); break;
 	case OBJECT_TYPE_BREAK_WALL: obj = new CBreakWall(x,y); break;
 	case OBJECT_TYPE_WALL_PIECES: 
 	{
 		obj = new CWallPiece();		
 		CWallPieces::GetInstance()->AddPiece((CWallPiece*)obj);
+		break;
+	}
+	case OBJECT_TYPE_HOLY_WATER:
+	{
+		obj =  HolyWater_Weapons::GetInstance();
+		CSubWeapons::GetInstance()->Add((int)SubWeapon::HOLYWATER, obj);
 		break;
 	}
 	case OBJECT_TYPE_BAT:
@@ -127,10 +175,25 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj = new BlackKnight_Enemies(x,y); 
 		break;
 	}
+	case OBJECT_TYPE_ZOMBIE:
+	{
+		obj = new Zombie_Enemies();
+		break;
+	}
+	case OBJECT_TYPE_SKELETON:
+	{
+		obj = new Skeleton_Enemies(x, y);
+		break;
+	}
+	case OBJECT_TYPE_HUNCH_BACK:
+	{
+		obj = new HunchBack_Enemies();
+		break;
+	}
 	case OBJECT_TYPE_CANDLE: 
 	{
-		 int it = atoi(tokens[4].c_str());
-		 int state = atoi(tokens[5].c_str());
+		int it = atoi(tokens[4].c_str());
+		int state = atoi(tokens[5].c_str());
 		obj = new CCandle();	
 		obj->SetState(state);
 		obj->SetItemId(it);		
@@ -157,7 +220,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	case OBJECT_TYPE_ITEM_MONEY_BAG:
 	{
+		int state = atoi(tokens[4].c_str());
 		obj = new MoneyPocket_Items();
+		obj->SetState(state);
 		items->AddItem((int)ItemType::MONEY_BAG, obj);
 		break;
 	}
@@ -165,6 +230,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		obj = new Boomerang_Items();
 		items->AddItem((int)ItemType::BOOMERANG, obj);
+		break;
+	}
+	case OBJECT_TYPE_ITEM_HOLY_WATER:
+	{
+		obj = new HolyWater_Items();
+		items->AddItem((int)ItemType::HOLY_WATER, obj);
 		break;
 	}
 	case OBJECT_TYPE_VARIOUS_STAIR:
@@ -194,14 +265,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj->SetOrientation(nx);
 		break;
 	}
+	case OBJECT_TYPE_DOOR:
+	{
+		float r = atof(tokens[4].c_str());
+		float b = atof(tokens[5].c_str());
+		obj = new CDoor(x, y, r, b);
+		break;
+	}
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
 		float b = atof(tokens[5].c_str());
 		int scene_id = atoi(tokens[6].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
+		break;
 	}
-	break;
 	default:
 		DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
 		return;
@@ -218,11 +296,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 void CPlayScene::_ParseSection_MAP_INFO(string line)
 {
 	vector<string> tokens = split(line);
-	if (tokens.size() < 2) return; // skip invalid lines
+	if (tokens.size() < 3) return; // skip invalid lines
 	this->mapWidth = atoi(tokens[0].c_str());
-	this->offset_y = atoi(tokens[1].c_str());
+	this->mapHeight = atoi(tokens[1].c_str());
+	this->offset_y= atoi(tokens[2].c_str());
 }
-
 
 void CPlayScene::Load()
 {
@@ -241,8 +319,10 @@ void CPlayScene::Load()
 	{
 		string line(str);
 
-		if (line[0] == '#') continue;	// skip comment lines	
+		if (line[0] == '#') continue;	// skip comment lines
 
+		if (line == "[PLAYER]") {
+			section = SCENE_SECTION_PLAYER; continue;}
 		if (line == "[OBJECTS]") { 
 			section = SCENE_SECTION_OBJECTS; continue;
 			}		
@@ -260,7 +340,8 @@ void CPlayScene::Load()
 		// data section
 		//
 		switch (section)
-		{ 
+		{
+			case SCENE_SECTION_PLAYER:_ParseSection_PLAYER(line); break;
 			case SCENE_SECTION_MAP_INFO: _ParseSection_MAP_INFO(line); break;
 			case SCENE_SECTION_TILE_MAP:_ParseSection_TILE_MAP(line); break;
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
@@ -279,7 +360,7 @@ void CPlayScene::Load()
 void CPlayScene::Update(DWORD dt)
 {	
 	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
 	{
 		if (objects[i]->visible == false)
 			continue;
@@ -294,6 +375,7 @@ void CPlayScene::Update(DWORD dt)
 	}
 
 	if (player == NULL) return;
+	player->Update(dt, &coObjects);
 
 	// Update camera to follow simon
 	float cx, cy;
@@ -332,6 +414,7 @@ void CPlayScene::Render()
 			continue;
 		objects[i]->Render();
 	}
+	player->Render();
 	HUD->Render();
 }
 
@@ -373,8 +456,9 @@ void CPlayScene::Unload()
 	for (int i = 0; i < objects.size(); i++)
 	{		
 		if (dynamic_cast<CSimon*>(objects[i]) || 
-			dynamic_cast<CWhip*>(objects[i])|| 
-			dynamic_cast<CDagger*>(objects[i]))
+			dynamic_cast<CWhip*>(objects[i]) || 
+			dynamic_cast<CDagger*>(objects[i]) ||
+			dynamic_cast<Boomerang_Weapons*>(objects[i]))
 		{
 			;
 		}
@@ -413,27 +497,8 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	}		
 	case DIK_S: // Attack
 	{
-		if (CGame::GetInstance()->IsKeyDown(DIK_UP)) // Sub weapon attack 
-		{
-			if (simon->subWeapon == false)
-				return;
-			if (simon->GetState()== SIMON_STATE_THROW && dagger->visible == true) return;
-
-			float xS, yS;
-			simon->GetPosition(xS, yS);
-			dagger->SetPosition(xS, yS);
-			dagger->SetOrientation(simon->nx);
-			dagger->SetVisible(true);
-			simon->SetState(SIMON_STATE_THROW);
-		}
-		if ((simon->GetState() == SIMON_STATE_ATTACK ||
-			simon->GetState() == SIMON_STATE_SIT_ATTACK))
-			return;
-
-		if (simon->GetState() == SIMON_STATE_IDLE ||
-			simon->GetState() == SIMON_STATE_JUMP ||
-			simon->GetState() == SIMON_STATE_GO_UPSTAIR ||
-			simon->GetState()== SIMON_ANI_GO_DOWNSTAIR) 
+		if ((simon->GetState() == SIMON_STATE_ATTACK ||simon->GetState() == SIMON_STATE_SIT_ATTACK)) return;
+		if (simon->GetState() == SIMON_STATE_IDLE ||	simon->GetState() == SIMON_STATE_JUMP || simon->GetState() == SIMON_STATE_GO_UPSTAIR || simon->GetState() == SIMON_ANI_GO_DOWNSTAIR)
 		{
 			simon->SetState(SIMON_STATE_ATTACK);
 		}
@@ -441,6 +506,17 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		{
 			simon->SetState(SIMON_STATE_SIT_ATTACK);
 		}
+
+		if (CGame::GetInstance()->IsKeyDown(DIK_UP) ) // Sub weapon attack 
+		{
+			float xS, yS;
+			simon->GetPosition(xS, yS);
+			dagger->SetPosition(xS, yS);
+			dagger->SetOrientation(simon->nx);
+			dagger->SetVisible(true);
+			simon->SetState(SIMON_STATE_THROW);
+		}
+
 		break;
 	}	
 	case DIK_D:

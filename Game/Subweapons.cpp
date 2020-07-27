@@ -1,30 +1,78 @@
 #include "SubWeapons.h"
+#include "Simon.h"
 
-SubWeapons* SubWeapons::__instance = NULL;
-SubWeapons* SubWeapons::GetInstance()
+CSubWeapons* CSubWeapons::__instance = NULL;
+
+void CSubWeapons::Add(int weapon, LPGAMEOBJECT obj)
 {
-	if (__instance == NULL)
-		__instance = new SubWeapons();
-
-	return __instance;
+	subweapons[weapon].push_back(obj);
 }
 
-LPGAMEOBJECT SubWeapons::GetWeapon(SubWeapon weapon)
-{
-	vector<LPGAMEOBJECT> weaponName = subweapons[weapon];
 
-	for (auto it = weaponName.begin(); it != weaponName.end(); ++it)
+void CSubWeapons::Select(int weapon)
+{
+	switch (weapon)
 	{
-		if ((*it)->isVisible() == false)
+	case (int)SubWeapon::DAGGER:
+		UseDagger();
+		break;
+
+	case (int)SubWeapon::BOOMERANG:
+		UseBoomerang();
+		break;
+
+	case (int)SubWeapon::HOLYWATER:
+		UseHolyWater();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void CSubWeapons::UseDagger()
+{
+}
+
+void CSubWeapons::UseBoomerang()
+{
+}
+
+void CSubWeapons::UseHolyWater()
+{
+	LPGAMEOBJECT holywater = GetWeapon((int)SubWeapon::HOLYWATER);
+	if (holywater == NULL) return;
+	holywater->SetVisible(true);
+	holywater->nx = CSimon::GetInstance()->GetOrientation();
+	float xS, yS;
+	CSimon::GetInstance()->GetPosition(xS, yS);
+	float xW = xS;
+	float yW= yS + 5;
+	holywater->SetPosition(xW, yW);
+}
+
+LPGAMEOBJECT CSubWeapons::GetWeapon(int weapon)
+{
+	if (subweapons[weapon].empty()) {
+
+	}
+	else
+	{
+		for (auto i = subweapons[weapon].begin(); i != subweapons[weapon].end(); ++i)
 		{
-			return *it;
+			if ((*i)->isVisible() == false)
+			{
+				return (*i);
+				break;
+			}
 		}
 	}
-	return NULL;
 }
 
-void SubWeapons::Add(SubWeapon name, LPGAMEOBJECT weapon)
+CSubWeapons* CSubWeapons::GetInstance()
 {
-	weapon->SetVisible(true);
-	subweapons[name].push_back(weapon);
-}
+	if (__instance == NULL)
+		__instance = new CSubWeapons();
+
+	return __instance;
+} 
